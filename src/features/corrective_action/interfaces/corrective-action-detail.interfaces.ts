@@ -7,6 +7,7 @@ export interface ActionDetailHeaderProps {
   readonly detectionFolio: string;
   readonly walkthroughFolio: string;
   readonly onBack: () => void;
+  readonly backLabel?: string;
 }
 
 export interface ActionDetailPhotoProps {

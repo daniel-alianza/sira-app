@@ -1,3 +1,5 @@
+import type { DashboardKpis } from './dashboard.interfaces';
+
 export const DASHBOARD_OVERVIEW_QUERY_KEY = ['dashboard', 'overview'] as const;
 export const DASHBOARD_AI_SUMMARY_QUERY_KEY = ['dashboard', 'ai-summary'] as const;
 
@@ -21,7 +23,7 @@ export const activityTypeOptions = [
   { value: 'unsafe_act', label: 'Acto inseguro' },
 ] as const;
 
-export const emptyDashboardKpis = {
+export const emptyDashboardKpis: DashboardKpis = {
   totalActions: 0,
   openActions: 0,
   closedActions: 0,
@@ -31,4 +33,6 @@ export const emptyDashboardKpis = {
   rejectedClosures: 0,
   walkthroughsPeriod: 0,
   avgClosureDays: 0,
-} as const;
+  notRespondedUsers: 0,
+  notSignedUsers: 0,
+};

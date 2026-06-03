@@ -8,6 +8,7 @@ import {
   dashboardSubtextClass,
 } from '@/features/dashboard/components/dashboard-ui.classes';
 import {
+  ActionsFiltersBar,
   ActionsPageHeader,
   ActionsStatusFilters,
   ActionsTable,
@@ -17,7 +18,8 @@ import { useActionsPage } from '../hooks/useActionsPage';
 export function ActionPage() {
   const roleName = useAuthStore((state) => state.user?.role?.name);
   const isResponsibleView = canRespondToActions(roleName);
-  const {    statusFilter,
+  const {
+    statusFilter,
     setStatusFilter,
     statusCounts,
     filteredActions,
@@ -25,6 +27,9 @@ export function ActionPage() {
     isLoading,
     isError,
     openActionDetail,
+    filters,
+    setFilter,
+    clearFilters,
   } = useActionsPage();
 
   return (
@@ -32,6 +37,18 @@ export function ActionPage() {
       <ActionsPageHeader
         pendingCount={pendingCount}
         isResponsibleView={isResponsibleView}
+      />
+
+      <ActionsFiltersBar
+        companyId={filters.companyId ?? ''}
+        areaId={filters.areaId ?? ''}
+        branchId={filters.branchId ?? ''}
+        responsibleId={filters.responsibleId ?? ''}
+        onCompanyChange={(v) => setFilter('companyId', v)}
+        onAreaChange={(v) => setFilter('areaId', v)}
+        onBranchChange={(v) => setFilter('branchId', v)}
+        onResponsibleChange={(v) => setFilter('responsibleId', v)}
+        onClear={clearFilters}
       />
 
       <ActionsStatusFilters

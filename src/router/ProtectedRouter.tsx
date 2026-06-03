@@ -10,7 +10,7 @@ import {
   ROLE_INSPECTOR,
   ROLE_RESPONSIBLE,
 } from '@/features/auth/utils/role-permissions';
-import { ToursPage } from '@/features/tours/pages/ToursPage';
+import { UnifiedWalkthroughAndActionsPage } from '@/features/tours/pages/UnifiedWalkthroughAndActionsPage';
 import { ActionPage } from '@/features/corrective_action/pages/ActionPage';
 import { ActionDetailPage } from '@/features/corrective_action/pages/ActionDetailPage';
 import { ReportsPage } from '@/features/reports/pages/ReportsPage';
@@ -41,7 +41,7 @@ export const ProtectedRouter: RouteObject[] = [
               <RoleRouteGuard
                 allowedRoles={[ROLE_ADMINISTRATOR, ROLE_INSPECTOR]}
               >
-                <ToursPage />
+                <UnifiedWalkthroughAndActionsPage />
               </RoleRouteGuard>
             ),
           },

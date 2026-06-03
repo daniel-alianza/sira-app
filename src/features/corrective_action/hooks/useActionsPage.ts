@@ -6,6 +6,7 @@ import type {
   ActionStatusFilter,
   CorrectiveActionItem,
 } from '../interfaces';
+import type { ActionsQueryParams } from '../service/action.service';
 import { fetchMyCorrectiveActions } from '../service/action.service';
 
 function countByStatus(
@@ -30,13 +31,36 @@ function countByStatus(
   return counts;
 }
 
+const FILTER_INITIAL: ActionsQueryParams = {
+  companyId: '',
+  areaId: '',
+  branchId: '',
+  responsibleId: '',
+  status: undefined,
+  dateFrom: undefined,
+  dateTo: undefined,
+};
+
 export function useActionsPage() {
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState<ActionStatusFilter>('all');
+  const [filters, setFilters] = useState<ActionsQueryParams>(FILTER_INITIAL);
+
+  const activeParams = useMemo(() => {
+    const p: Record<string, string> = {};
+    let hasAny = false;
+
+    if (filters.companyId) { p.companyId = filters.companyId; hasAny = true; }
+    if (filters.areaId) { p.areaId = filters.areaId; hasAny = true; }
+    if (filters.branchId) { p.branchId = filters.branchId; hasAny = true; }
+    if (filters.responsibleId) { p.responsibleId = filters.responsibleId; hasAny = true; }
+
+    return hasAny ? (p as ActionsQueryParams) : undefined;
+  }, [filters]);
 
   const actionsQuery = useQuery({
-    queryKey: CORRECTIVE_ACTIONS_QUERY_KEY,
-    queryFn: fetchMyCorrectiveActions,
+    queryKey: [...CORRECTIVE_ACTIONS_QUERY_KEY, activeParams],
+    queryFn: () => fetchMyCorrectiveActions(activeParams),
   });
 
   const allActions = actionsQuery.data ?? [];
@@ -56,6 +80,14 @@ export function useActionsPage() {
     navigate(`/actions/${action.id}`);
   }
 
+  function setFilter(key: string, value: string) {
+    setFilters((prev) => ({ ...prev, [key]: value || '' }) as ActionsQueryParams);
+  }
+
+  function clearFilters() {
+    setFilters(FILTER_INITIAL);
+  }
+
   return {
     statusFilter,
     setStatusFilter,
@@ -65,5 +97,8 @@ export function useActionsPage() {
     isLoading: actionsQuery.isLoading,
     isError: actionsQuery.isError,
     openActionDetail,
+    filters,
+    setFilter,
+    clearFilters,
   };
 }

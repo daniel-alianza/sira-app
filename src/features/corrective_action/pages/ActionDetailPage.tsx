@@ -1,10 +1,15 @@
-import { Loader2 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { Loader2, UserRound } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router';
+import { useState } from 'react';
 import { useAuthStore } from '@/features/auth/store/auth.store';
 import {
+  ROLE_ADMINISTRATOR,
+  ROLE_INSPECTOR,
   canRespondToActions,
   canReviewActionClosure,
 } from '@/features/auth/utils/role-permissions';
+import { getUsers } from '@/features/users/services/users.service';
 import {
   ActionDetailCommitmentHistory,
   ActionDetailClosureReviewForm,
@@ -15,6 +20,7 @@ import {
   ActionDetailResolutionForm,
   ActionDetailRespondForm,
   ActionDetailStatusPanel,
+  ReassignResponsibleModal,
 } from '../components';
 import { useActionDetail } from '../hooks/useActionDetail';
 
@@ -25,9 +31,19 @@ export function ActionDetailPage() {
   const canRespond = canRespondToActions(roleName);
   const canReviewClosure = canReviewActionClosure(roleName);
   const detailQuery = useActionDetail(actionId);
+  const [reassignModalOpen, setReassignModalOpen] = useState(false);
+
+  const usersQuery = useQuery({
+    queryKey: ['users', 'active'],
+    queryFn: getUsers,
+    enabled: canReviewClosure,
+  });
+
+  const isAdminOrInspector = roleName === ROLE_ADMINISTRATOR || roleName === ROLE_INSPECTOR;
+  const backLabel = isAdminOrInspector ? 'Volver a recorridos' : 'Volver a mis acciones';
 
   function handleBack() {
-    navigate('/actions');
+    navigate(isAdminOrInspector ? '/tours' : '/actions');
   }
 
   if (detailQuery.isLoading) {
@@ -60,13 +76,40 @@ export function ActionDetailPage() {
 
   const detail = detailQuery.data;
 
+  const userOptions = (usersQuery.data ?? [])
+    .filter((u) => u.isActive)
+    .map((u) => ({ value: u.id, label: u.name }));
+
   return (
     <div className="mx-auto w-full max-w-5xl space-y-5 md:space-y-6">
-      <ActionDetailHeader
-        detectionFolio={detail.detectionFolio}
-        walkthroughFolio={detail.walkthroughFolio}
-        onBack={handleBack}
-      />
+      <div className="flex items-start justify-between gap-4">
+        <ActionDetailHeader
+          detectionFolio={detail.detectionFolio}
+          walkthroughFolio={detail.walkthroughFolio}
+          onBack={handleBack}
+          backLabel={backLabel}
+        />
+        {canReviewClosure && (
+          <button
+            type="button"
+            onClick={() => setReassignModalOpen(true)}
+            className="mt-2 inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-[#0A2240] shadow-sm transition-colors hover:bg-slate-50"
+          >
+            <UserRound className="size-3.5" />
+            Reasignar responsable
+          </button>
+        )}
+      </div>
+
+      {actionId && (
+        <ReassignResponsibleModal
+          actionId={actionId}
+          open={reassignModalOpen}
+          onClose={() => setReassignModalOpen(false)}
+          users={userOptions}
+          currentResponsibleName={detail.responsibleName}
+        />
+      )}
 
       <ActionDetailEvidenceGallery
         inspectorName={detail.inspectorName}

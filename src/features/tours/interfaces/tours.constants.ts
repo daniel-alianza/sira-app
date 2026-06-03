@@ -32,7 +32,7 @@ export const ACTION_STATUS_CONFIG: Record<
     label: 'Pendiente de aceptación',
     className: 'bg-violet-50 text-violet-800',
   },
-  open: { label: 'Abierta', className: 'bg-sky-50 text-sky-800' },
+  open: { label: 'Abierta', className: 'bg-amber-50 text-amber-800' },
   pending: { label: 'Pendiente', className: 'bg-orange-50 text-orange-800' },
   expired: { label: 'Expirada', className: 'bg-red-50 text-red-800' },
   closure_review: {

@@ -53,7 +53,7 @@ export const dashboardNavItems: DashboardNavItem[] = [
     shortLabel: 'Acciones',
     icon: ClipboardList,
     showInMobileTab: true,
-    allowedRoles: [ROLE_ADMINISTRATOR, ROLE_INSPECTOR, ROLE_RESPONSIBLE],
+    allowedRoles: [ROLE_RESPONSIBLE],
   },
   {
     id: 'reports',

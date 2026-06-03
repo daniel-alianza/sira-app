@@ -10,6 +10,7 @@ import type {
   ReviewCorrectiveClosureResult,
   SubmitResolutionPhotoPayload,
   SubmitResolutionPhotoResult,
+  TourDetectionType,
 } from '../interfaces';
 
 function getActionsErrorMessage(error: unknown, fallback: string): string {
@@ -30,10 +31,33 @@ function getActionsErrorMessage(error: unknown, fallback: string): string {
   return error.message || fallback;
 }
 
-export async function fetchMyCorrectiveActions(): Promise<CorrectiveActionItem[]> {
+export interface ActionsQueryParams {
+  readonly companyId?: string;
+  readonly areaId?: string;
+  readonly branchId?: string;
+  readonly responsibleId?: string;
+  readonly status?: string;
+  readonly dateFrom?: string;
+  readonly dateTo?: string;
+}
+
+export async function fetchMyCorrectiveActions(
+  queryParams?: ActionsQueryParams,
+): Promise<CorrectiveActionItem[]> {
   try {
+    const params: Record<string, string> = {};
+
+    if (queryParams?.companyId) params.companyId = queryParams.companyId;
+    if (queryParams?.areaId) params.areaId = queryParams.areaId;
+    if (queryParams?.branchId) params.branchId = queryParams.branchId;
+    if (queryParams?.responsibleId) params.responsibleId = queryParams.responsibleId;
+    if (queryParams?.status) params.status = queryParams.status;
+    if (queryParams?.dateFrom) params.dateFrom = queryParams.dateFrom;
+    if (queryParams?.dateTo) params.dateTo = queryParams.dateTo;
+
     const { data } = await siraApi.get<ApiResponse<CorrectiveActionItem[]>>(
       '/corrective-actions',
+      { params },
     );
     return data.data;
   } catch (error) {
@@ -41,6 +65,50 @@ export async function fetchMyCorrectiveActions(): Promise<CorrectiveActionItem[]
       getActionsErrorMessage(
         error,
         'No se pudieron cargar tus acciones correctivas. Intenta de nuevo.',
+      ),
+      { cause: error },
+    );
+  }
+}
+
+export interface ClosedActionSummaryRow {
+  readonly id: string;
+  readonly detectionFolio: string;
+  readonly walkthroughFolio: string;
+  readonly detectionType: TourDetectionType;
+  readonly description: string;
+  readonly responsibleName: string;
+  readonly companyName: string;
+  readonly branchName: string;
+  readonly areaName: string;
+  readonly closedAt: string;
+  readonly evidencePhotoUrl: string | null;
+  readonly resolutionPhotoUrl: string | null;
+}
+
+export async function fetchClosedCorrectiveActions(
+  queryParams?: ActionsQueryParams,
+): Promise<ClosedActionSummaryRow[]> {
+  try {
+    const params: Record<string, string> = {};
+
+    if (queryParams?.companyId) params.companyId = queryParams.companyId;
+    if (queryParams?.areaId) params.areaId = queryParams.areaId;
+    if (queryParams?.branchId) params.branchId = queryParams.branchId;
+    if (queryParams?.responsibleId) params.responsibleId = queryParams.responsibleId;
+    if (queryParams?.dateFrom) params.dateFrom = queryParams.dateFrom;
+    if (queryParams?.dateTo) params.dateTo = queryParams.dateTo;
+
+    const { data } = await siraApi.get<ApiResponse<ClosedActionSummaryRow[]>>(
+      '/corrective-actions/closed',
+      { params },
+    );
+    return data.data;
+  } catch (error) {
+    throw new Error(
+      getActionsErrorMessage(
+        error,
+        'No se pudieron cargar las acciones cerradas.',
       ),
       { cause: error },
     );
@@ -102,6 +170,26 @@ export async function submitCorrectiveResolutionPhoto(
       getActionsErrorMessage(
         error,
         'No se pudo registrar la evidencia de resolución. Intenta de nuevo.',
+      ),
+      { cause: error },
+    );
+  }
+}
+
+export async function reassignCorrectiveActionResponsible(
+  actionId: string,
+  newResponsibleId: string,
+): Promise<void> {
+  try {
+    await siraApi.patch<ApiResponse<null>>(
+      `/corrective-actions/${actionId}/reassign`,
+      { newResponsibleId },
+    );
+  } catch (error) {
+    throw new Error(
+      getActionsErrorMessage(
+        error,
+        'No se pudo reasignar el responsable. Intenta de nuevo.',
       ),
       { cause: error },
     );

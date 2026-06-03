@@ -5,6 +5,8 @@ import {
   Clock,
   FileSearch,
   FolderOpen,
+  MessageCircleOff,
+  PenOff,
   Route,
   UserX,
 } from 'lucide-react';
@@ -33,6 +35,8 @@ function buildKpiItems(kpis: DashboardKpis) {
     { id: 'closure-review', label: 'En rev. de cierre', value: kpis.closureReview, icon: FileSearch, tone: 'default' as const },
     { id: 'rejected', label: 'Rechazadas', value: kpis.rejectedClosures, icon: Clock, tone: 'danger' as const },
     { id: 'walkthroughs', label: 'Recorridos (periodo)', value: kpis.walkthroughsPeriod, icon: Route, tone: 'default' as const },
+    { id: 'not-responded', label: 'No han contestado', value: kpis.notRespondedUsers, icon: MessageCircleOff, tone: 'warning' as const },
+    { id: 'not-signed', label: 'No han firmado', value: kpis.notSignedUsers, icon: PenOff, tone: 'warning' as const },
   ];
 }
 

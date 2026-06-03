@@ -14,3 +14,5 @@ export { ActionsEmptyState } from './ActionsEmptyState';
 export { ActionsPageHeader } from './ActionsPageHeader';
 export { ActionsStatusFilters } from './ActionsStatusFilters';
 export { ActionsTable } from './ActionsTable';
+export { ActionsFiltersBar } from './ActionsFiltersBar';
+export { ReassignResponsibleModal } from './ReassignResponsibleModal';
