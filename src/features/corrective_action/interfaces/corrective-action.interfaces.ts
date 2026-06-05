@@ -8,6 +8,8 @@ export type { CorrectiveActionStatus, TourDetectionType };
 
 export type ActionStatusFilter = CorrectiveActionStatus | 'all';
 
+export type ActionsListStatusGroup = 'all' | 'active';
+
 export interface CorrectiveActionItem {
   readonly id: string;
   readonly detectionFolio: string;
@@ -23,6 +25,8 @@ export interface CorrectiveActionItem {
   readonly commitmentSequence: number | null;
   readonly assignedAt: string;
   readonly tourDate: string;
+  readonly evidencePhotoUrl: string | null;
+  readonly resolutionPhotoUrl: string | null;
 }
 
 export interface CorrectiveActionDetail extends CorrectiveActionItem {

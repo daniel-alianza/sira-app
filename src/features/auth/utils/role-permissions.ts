@@ -14,6 +14,10 @@ export function isSessionRoleName(value?: string): value is SessionRoleName {
   return APP_ROLE_NAMES.includes(value as SessionRoleName);
 }
 
+export function canAccessUsers(roleName?: string): boolean {
+  return roleName === ROLE_ADMINISTRATOR || roleName === ROLE_INSPECTOR;
+}
+
 export function canManageUsers(roleName?: string): boolean {
   return roleName === ROLE_ADMINISTRATOR;
 }

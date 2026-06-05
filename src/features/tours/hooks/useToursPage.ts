@@ -25,6 +25,7 @@ export function useToursPage() {
     openDetectionModal,
     closeDetectionModal,
     registerDetection,
+    updateDetectionEvidence,
   } = useTourSession();
 
   const registerWalkthroughMutation = useMutation({
@@ -80,5 +81,6 @@ export function useToursPage() {
     handleDetectionSubmit,
     handleStartTour,
     handleFinishTour,
+    updateDetectionEvidence,
   };
 }

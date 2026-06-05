@@ -9,6 +9,7 @@ export type {
   ActionsStatusFiltersProps,
   ActionsTableProps,
   ActionStatusFilter,
+  ActionsListStatusGroup,
   ApiResponse,
   CorrectiveActionDetail,
   CorrectiveActionItem,

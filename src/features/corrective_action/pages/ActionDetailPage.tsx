@@ -13,6 +13,7 @@ import { getUsers } from '@/features/users/services/users.service';
 import {
   ActionDetailCommitmentHistory,
   ActionDetailClosureReviewForm,
+  ActionDetailDetectionEvidenceForm,
   ActionDetailEvidenceGallery,
   ActionDetailHeader,
   ActionDetailObservation,
@@ -119,6 +120,10 @@ export function ActionDetailPage() {
         respondedAt={detail.resolutionResolvedAt ?? detail.respondedAt}
         resolutionPhotoUrl={detail.resolutionPhotoUrl}
       />
+
+      {actionId && isAdminOrInspector && !detail.photoUrl && (
+        <ActionDetailDetectionEvidenceForm actionId={actionId} />
+      )}
 
       <ActionDetailProgressTimeline detail={detail} />
 

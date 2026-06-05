@@ -1,6 +1,6 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { format, subDays } from 'date-fns';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import {
   DASHBOARD_AI_SUMMARY_QUERY_KEY,
   DASHBOARD_ALL_FILTER_VALUE,
@@ -25,6 +25,10 @@ function getDefaultDateRange(): DashboardDateRangeValue {
     from: format(from, 'yyyy-MM-dd'),
     to: format(to, 'yyyy-MM-dd'),
   };
+}
+
+function getTodayIsoDate(): string {
+  return format(new Date(), 'yyyy-MM-dd');
 }
 
 function buildDashboardQueryParams(
@@ -66,6 +70,23 @@ function withAllOption(
   allLabel: string,
 ): DashboardFilterOption[] {
   return [{ value: DASHBOARD_ALL_FILTER_VALUE, label: allLabel }, ...options];
+}
+
+function isOptionValuePresent(
+  value: string,
+  options: readonly DashboardFilterOption[],
+): boolean {
+  return options.some((option) => option.value === value);
+}
+
+function normalizeFilterValue(
+  value: string,
+  options: readonly DashboardFilterOption[],
+): string {
+  if (isOptionValuePresent(value, options)) {
+    return value;
+  }
+  return DASHBOARD_ALL_FILTER_VALUE;
 }
 
 export function useDashboardPage() {
@@ -118,11 +139,77 @@ export function useDashboardPage() {
     'Todos',
   );
 
+  useEffect(() => {
+    const overview = overviewQuery.data;
+    if (!overview) {
+      return;
+    }
+
+    const normalizedCompanyOptions = withAllOption(
+      overview.filterOptions.companies,
+      'Todas las empresas',
+    );
+    const normalizedAreaOptions = withAllOption(
+      overview.filterOptions.areas,
+      'Todas las áreas',
+    );
+    const normalizedResponsibleOptions = withAllOption(
+      overview.filterOptions.responsibles,
+      'Todos',
+    );
+
+    setFilters((current) => {
+      const nextCompanyId = normalizeFilterValue(
+        current.companyId,
+        normalizedCompanyOptions,
+      );
+      const nextAreaId = normalizeFilterValue(current.areaId, normalizedAreaOptions);
+      const nextResponsibleId = normalizeFilterValue(
+        current.responsibleId,
+        normalizedResponsibleOptions,
+      );
+
+      if (
+        nextCompanyId === current.companyId &&
+        nextAreaId === current.areaId &&
+        nextResponsibleId === current.responsibleId
+      ) {
+        return current;
+      }
+
+      return {
+        ...current,
+        companyId: nextCompanyId,
+        areaId: nextAreaId,
+        responsibleId: nextResponsibleId,
+      };
+    });
+  }, [overviewQuery.data]);
+
   function updateFilter<K extends keyof DashboardFiltersState>(
     key: K,
     value: DashboardFiltersState[K],
   ) {
-    setFilters((current: DashboardFiltersState) => ({ ...current, [key]: value }));
+    setFilters((current: DashboardFiltersState) => {
+      if (key === 'companyId') {
+        return {
+          ...current,
+          companyId: value as string,
+          areaId: DASHBOARD_ALL_FILTER_VALUE,
+          responsibleId: DASHBOARD_ALL_FILTER_VALUE,
+        };
+      }
+
+      if (key === 'areaId') {
+        return {
+          ...current,
+          areaId: value as string,
+          responsibleId: DASHBOARD_ALL_FILTER_VALUE,
+        };
+      }
+
+      return { ...current, [key]: value };
+    });
   }
 
   function updateDateRange(value: DashboardDateRangeValue) {
@@ -133,10 +220,19 @@ export function useDashboardPage() {
     }));
   }
 
+  function applyDateRangeFromFirstWalkthrough(firstWalkthroughDate: string) {
+    setFilters((current: DashboardFiltersState) => ({
+      ...current,
+      dateFrom: firstWalkthroughDate,
+      dateTo: getTodayIsoDate(),
+    }));
+  }
+
   return {
     filters,
     updateFilter,
     updateDateRange,
+    applyDateRangeFromFirstWalkthrough,
     companyOptions,
     areaOptions,
     responsibleOptions,

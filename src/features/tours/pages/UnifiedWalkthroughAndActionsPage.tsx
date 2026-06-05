@@ -13,7 +13,6 @@ import {
   type CorrectiveActionItem,
 } from '@/features/corrective_action/interfaces';
 import { fetchMyCorrectiveActions } from '@/features/corrective_action/service/action.service';
-import { ClosedActionsPage } from '@/features/corrective_action/pages/ClosedActionsPage';
 import { useToursPage } from '../hooks/useToursPage';
 import {
   DetectionModal,
@@ -41,6 +40,7 @@ export function UnifiedWalkthroughAndActionsPage() {
     handleDetectionSubmit,
     handleStartTour,
     handleFinishTour,
+    updateDetectionEvidence,
   } = useToursPage();
 
   const actionsQuery = useQuery({
@@ -68,6 +68,7 @@ export function UnifiedWalkthroughAndActionsPage() {
           finishError={finishError}
           onAddDetection={openDetectionModal}
           onFinishTour={handleFinishTour}
+          onUpdateDetectionEvidence={updateDetectionEvidence}
         />
       )}
 
@@ -77,9 +78,9 @@ export function UnifiedWalkthroughAndActionsPage() {
         detectionCount={activeSession?.detections.length ?? 0}
         catalog={catalogQuery.data}
         isCatalogLoading={catalogQuery.isLoading}
-        responsibleOptions={responsibleQuery.options}
-        isResponsibleLoading={responsibleQuery.isLoading}
-        isResponsibleError={responsibleQuery.isError}
+        allUsers={responsibleQuery.data}
+        isAllUsersLoading={responsibleQuery.isLoading}
+        isAllUsersError={responsibleQuery.isError}
         onClose={closeDetectionModal}
         onSubmit={handleDetectionSubmit}
       />
@@ -163,10 +164,6 @@ export function UnifiedWalkthroughAndActionsPage() {
             ))}
           </div>
         )}
-      </div>
-
-      <div className="border-t border-slate-200 pt-5 md:pt-6">
-        <ClosedActionsPage variant="section" />
       </div>
     </div>
   );

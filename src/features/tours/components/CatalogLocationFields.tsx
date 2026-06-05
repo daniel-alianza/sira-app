@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Building2, Layers, MapPin } from 'lucide-react';
+import { Building2, Layers, MapPin, UserRound } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -22,6 +22,9 @@ export function CatalogLocationFields({
   onCompanyChange,
   onBranchChange,
   onAreaChange,
+  responsibleId,
+  onResponsibleChange,
+  responsibleOptions,
 }: CatalogLocationFieldsProps) {
   const companyItems = useMemo(
     () => toCatalogSelectOptions(catalog.companies),
@@ -119,6 +122,36 @@ export function CatalogLocationFields({
           </SelectContent>
         </Select>
         {areaError && <p className="text-xs text-destructive">{areaError}</p>}
+      </div>
+
+      <div className="space-y-1.5">
+        <Label htmlFor="tour-responsibleId" className="flex items-center gap-1.5">
+          <UserRound className="size-3.5 text-slate-400" />
+          Responsable
+        </Label>
+        <Select
+          value={responsibleId ?? ''}
+          onValueChange={(value) => onResponsibleChange?.(value ?? '')}
+          items={responsibleOptions?.map((o) => ({ value: o.value, label: o.label })) ?? []}
+          disabled={!responsibleOptions || responsibleOptions.length === 0}
+        >
+          <SelectTrigger id="tour-responsibleId" className="w-full">
+            <SelectValue
+              placeholder={
+                responsibleOptions && responsibleOptions.length > 0
+                  ? 'Seleccionar responsable'
+                  : 'Sin responsables disponibles'
+              }
+            />
+          </SelectTrigger>
+          <SelectContent>
+            {responsibleOptions?.map((option) => (
+              <SelectItem key={option.value} value={option.value}>
+                {option.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
     </div>
   );

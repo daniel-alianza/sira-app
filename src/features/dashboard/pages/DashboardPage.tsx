@@ -4,8 +4,10 @@ import { DashboardAiSummary } from '../components/DashboardAiSummary';
 import { DashboardAreaComplianceCards } from '../components/DashboardAreaComplianceCards';
 import { DashboardChartsSection } from '../components/DashboardChartsSection';
 import { DashboardCommitmentDateRequests } from '../components/DashboardCommitmentDateRequests';
+import { DashboardActionStatusLegend } from '../components/DashboardActionStatusLegend';
 import { DashboardFilters } from '../components/DashboardFilters';
 import { DashboardKpiCards } from '../components/DashboardKpiCards';
+import { DashboardOpenActionsSection } from '../components/DashboardOpenActionsSection';
 import { DashboardOperationalQueues } from '../components/DashboardOperationalQueues';
 import { dashboardHeadingClass } from '../components/dashboard-ui.classes';
 import { useDashboardPage } from '../hooks/useDashboardPage';
@@ -25,15 +27,16 @@ export function DashboardPage() {
 
   return (
     <>
-      <div className='mb-4 md:mb-6'>
+      <div className="mb-4 flex flex-col gap-4 md:mb-6 md:flex-row md:items-start md:justify-between md:gap-6">
         <h1
           className={cn(
             dashboardHeadingClass,
-            'hidden !text-3xl max-md:!text-2xl md:block',
+            'hidden shrink-0 !text-3xl max-md:!text-2xl md:block',
           )}
         >
           Hola, {displayName}
         </h1>
+        <DashboardActionStatusLegend className="min-w-0 md:max-w-[min(100%,52rem)] md:flex-1" />
       </div>
 
       <DashboardFilters
@@ -52,10 +55,18 @@ export function DashboardPage() {
         onActivityChange={(value) => dashboard.updateFilter('activity', value)}
         onStatusChange={(value) => dashboard.updateFilter('status', value)}
         onDateRangeChange={dashboard.updateDateRange}
+        firstWalkthroughDate={dashboard.overview?.firstWalkthroughDate ?? null}
+        onApplyFromFirstWalkthrough={() => {
+          const firstDate = dashboard.overview?.firstWalkthroughDate;
+          if (firstDate) {
+            dashboard.applyDateRangeFromFirstWalkthrough(firstDate);
+          }
+        }}
       />
 
       <DashboardKpiCards
         kpis={kpis}
+        filters={dashboard.filters}
         isLoading={dashboard.isOverviewLoading}
       />
 
@@ -68,6 +79,11 @@ export function DashboardPage() {
             void dashboard.refetchAiSummary();
           }}
         />
+        <DashboardOpenActionsSection
+          actions={dashboard.overview?.openActions ?? []}
+          filters={dashboard.filters}
+          isLoading={dashboard.isOverviewLoading}
+        />
         <DashboardCommitmentDateRequests
           requests={dashboard.overview?.commitmentDateRequests ?? []}
           isLoading={dashboard.isOverviewLoading}
@@ -79,11 +95,7 @@ export function DashboardPage() {
       </section>
 
       <DashboardOperationalQueues
-        queues={dashboard.overview?.operationalQueues ?? {
-          pendingSignature: [],
-          closureReview: [],
-          expiredActions: [],
-        }}
+        queues={dashboard.overview?.operationalQueues}
         isLoading={dashboard.isOverviewLoading}
       />
       <DashboardAreaComplianceCards

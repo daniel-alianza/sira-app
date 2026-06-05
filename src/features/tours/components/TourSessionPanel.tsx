@@ -1,4 +1,4 @@
-import { Building2, Loader2, MapPin, Plus, Route, ShieldAlert } from 'lucide-react';
+import { Loader2, Plus, Route } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   dashboardButtonPrimary,
@@ -7,46 +7,8 @@ import {
   dashboardHeadingClass,
   dashboardSubtextClass,
 } from '@/features/dashboard/components/dashboard-ui.classes';
-import {
-  DETECTION_TYPE_LABELS,
-  DETECTION_TYPE_STYLES,
-} from '../interfaces';
-import type { TourDetectionRecord, TourSessionPanelProps } from '../interfaces';
-
-function TourDetectionCard({ detection }: { detection: TourDetectionRecord }) {
-  return (
-    <article className="rounded-xl border border-slate-200/90 bg-white p-3.5 shadow-sm">
-      <div className="flex flex-wrap items-start justify-between gap-2">
-        <p className="font-mono text-xs font-semibold text-[#00a896]">{detection.folio}</p>
-        <span
-          className={cn(
-            'rounded-full px-2 py-0.5 text-[10px] font-medium',
-            DETECTION_TYPE_STYLES[detection.detectionType],
-          )}
-        >
-          {DETECTION_TYPE_LABELS[detection.detectionType]}
-        </span>
-      </div>
-      <p className="mt-2 line-clamp-2 text-sm text-[#0A2240]">{detection.description}</p>
-      <p className="mt-2 text-sm font-medium text-[#0A2240]">{detection.responsibleName}</p>
-      <div className="mt-3 flex flex-wrap gap-2 text-[11px] text-slate-600">
-        <span className="inline-flex items-center gap-1 rounded-lg bg-slate-50 px-2 py-1">
-          <Building2 className="size-3 shrink-0 text-slate-400" />
-          {detection.companyName}
-        </span>
-        <span className="inline-flex items-center gap-1 rounded-lg bg-slate-50 px-2 py-1">
-          <MapPin className="size-3 shrink-0 text-slate-400" />
-          {detection.branchName}
-        </span>
-        <span className="inline-flex items-center gap-1 rounded-lg bg-slate-50 px-2 py-1">
-          <ShieldAlert className="size-3 shrink-0 text-slate-400" />
-          {detection.areaName}
-        </span>
-      </div>
-      <p className="mt-2 text-[10px] text-slate-400">{detection.createdAt}</p>
-    </article>
-  );
-}
+import type { TourSessionPanelProps } from '../interfaces';
+import { TourSessionDetectionCard } from './TourSessionDetectionCard';
 
 export function TourSessionPanel({
   session,
@@ -54,6 +16,7 @@ export function TourSessionPanel({
   finishError,
   onAddDetection,
   onFinishTour,
+  onUpdateDetectionEvidence,
 }: TourSessionPanelProps) {
   return (
     <div className={cn(dashboardCard(), 'overflow-hidden p-0')}>
@@ -124,7 +87,10 @@ export function TourSessionPanel({
           <ul className="grid gap-3 sm:grid-cols-2">
             {session.detections.map((detection) => (
               <li key={detection.id}>
-                <TourDetectionCard detection={detection} />
+                <TourSessionDetectionCard
+                  detection={detection}
+                  onUpdateEvidence={onUpdateDetectionEvidence}
+                />
               </li>
             ))}
           </ul>

@@ -29,7 +29,7 @@ export function ToursListCard({
           {activePeriodLabel}
         </h2>
         <p className={cn(dashboardSubtextClass, 'mt-0.5 text-xs')}>
-          Folio de detección, responsable, estatus y fecha compromiso
+          Fotografías, detalle del hallazgo, ubicación y estatus
         </p>
       </div>
 

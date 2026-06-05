@@ -45,6 +45,9 @@ export function ActionsFiltersBar({
 
   const users = (usersQuery.data ?? [])
     .filter((user) => user.isActive)
+    .filter((user) => !companyId || user.companyId === companyId)
+    .filter((user) => !areaId || user.areaId === areaId)
+    .filter((user) => !branchId || user.branchId === branchId)
     .map((user) => ({ value: user.id, label: user.name }));
 
   const selectClass =

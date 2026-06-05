@@ -1,5 +1,9 @@
 import axios from 'axios';
 import { siraApi } from '@/api/sira-api';
+import {
+  isActionsListIsoDate,
+  isActionsListUuid,
+} from '../utils/actions-list-query.utils';
 import type {
   ApiResponse,
   CorrectiveActionDetail,
@@ -10,7 +14,6 @@ import type {
   ReviewCorrectiveClosureResult,
   SubmitResolutionPhotoPayload,
   SubmitResolutionPhotoResult,
-  TourDetectionType,
 } from '../interfaces';
 
 function getActionsErrorMessage(error: unknown, fallback: string): string {
@@ -36,28 +39,57 @@ export interface ActionsQueryParams {
   readonly areaId?: string;
   readonly branchId?: string;
   readonly responsibleId?: string;
-  readonly status?: string;
   readonly dateFrom?: string;
   readonly dateTo?: string;
+}
+
+function sanitizeActionsQueryParams(
+  queryParams?: ActionsQueryParams,
+): ActionsQueryParams | undefined {
+  if (!queryParams) {
+    return undefined;
+  }
+
+  const params: ActionsQueryParams = {};
+  let hasAny = false;
+
+  if (queryParams.companyId && isActionsListUuid(queryParams.companyId)) {
+    params.companyId = queryParams.companyId;
+    hasAny = true;
+  }
+  if (queryParams.areaId && isActionsListUuid(queryParams.areaId)) {
+    params.areaId = queryParams.areaId;
+    hasAny = true;
+  }
+  if (queryParams.branchId && isActionsListUuid(queryParams.branchId)) {
+    params.branchId = queryParams.branchId;
+    hasAny = true;
+  }
+  if (queryParams.responsibleId && isActionsListUuid(queryParams.responsibleId)) {
+    params.responsibleId = queryParams.responsibleId;
+    hasAny = true;
+  }
+  if (queryParams.dateFrom && isActionsListIsoDate(queryParams.dateFrom)) {
+    params.dateFrom = queryParams.dateFrom;
+    hasAny = true;
+  }
+  if (queryParams.dateTo && isActionsListIsoDate(queryParams.dateTo)) {
+    params.dateTo = queryParams.dateTo;
+    hasAny = true;
+  }
+
+  return hasAny ? params : undefined;
 }
 
 export async function fetchMyCorrectiveActions(
   queryParams?: ActionsQueryParams,
 ): Promise<CorrectiveActionItem[]> {
   try {
-    const params: Record<string, string> = {};
-
-    if (queryParams?.companyId) params.companyId = queryParams.companyId;
-    if (queryParams?.areaId) params.areaId = queryParams.areaId;
-    if (queryParams?.branchId) params.branchId = queryParams.branchId;
-    if (queryParams?.responsibleId) params.responsibleId = queryParams.responsibleId;
-    if (queryParams?.status) params.status = queryParams.status;
-    if (queryParams?.dateFrom) params.dateFrom = queryParams.dateFrom;
-    if (queryParams?.dateTo) params.dateTo = queryParams.dateTo;
+    const sanitizedParams = sanitizeActionsQueryParams(queryParams);
 
     const { data } = await siraApi.get<ApiResponse<CorrectiveActionItem[]>>(
       '/corrective-actions',
-      { params },
+      { params: sanitizedParams },
     );
     return data.data;
   } catch (error) {
@@ -65,50 +97,6 @@ export async function fetchMyCorrectiveActions(
       getActionsErrorMessage(
         error,
         'No se pudieron cargar tus acciones correctivas. Intenta de nuevo.',
-      ),
-      { cause: error },
-    );
-  }
-}
-
-export interface ClosedActionSummaryRow {
-  readonly id: string;
-  readonly detectionFolio: string;
-  readonly walkthroughFolio: string;
-  readonly detectionType: TourDetectionType;
-  readonly description: string;
-  readonly responsibleName: string;
-  readonly companyName: string;
-  readonly branchName: string;
-  readonly areaName: string;
-  readonly closedAt: string;
-  readonly evidencePhotoUrl: string | null;
-  readonly resolutionPhotoUrl: string | null;
-}
-
-export async function fetchClosedCorrectiveActions(
-  queryParams?: ActionsQueryParams,
-): Promise<ClosedActionSummaryRow[]> {
-  try {
-    const params: Record<string, string> = {};
-
-    if (queryParams?.companyId) params.companyId = queryParams.companyId;
-    if (queryParams?.areaId) params.areaId = queryParams.areaId;
-    if (queryParams?.branchId) params.branchId = queryParams.branchId;
-    if (queryParams?.responsibleId) params.responsibleId = queryParams.responsibleId;
-    if (queryParams?.dateFrom) params.dateFrom = queryParams.dateFrom;
-    if (queryParams?.dateTo) params.dateTo = queryParams.dateTo;
-
-    const { data } = await siraApi.get<ApiResponse<ClosedActionSummaryRow[]>>(
-      '/corrective-actions/closed',
-      { params },
-    );
-    return data.data;
-  } catch (error) {
-    throw new Error(
-      getActionsErrorMessage(
-        error,
-        'No se pudieron cargar las acciones cerradas.',
       ),
       { cause: error },
     );
@@ -149,6 +137,35 @@ export async function respondCorrectiveAction(
       getActionsErrorMessage(
         error,
         'No se pudo guardar tu respuesta. Intenta de nuevo.',
+      ),
+      { cause: error },
+    );
+  }
+}
+
+export interface SubmitDetectionEvidencePayload {
+  readonly evidencePhotoDataUrl: string;
+}
+
+export interface SubmitDetectionEvidenceResult {
+  readonly evidencePhotoUrl: string;
+}
+
+export async function submitDetectionEvidence(
+  actionId: string,
+  payload: SubmitDetectionEvidencePayload,
+): Promise<SubmitDetectionEvidenceResult> {
+  try {
+    const { data } = await siraApi.post<ApiResponse<SubmitDetectionEvidenceResult>>(
+      `/corrective-actions/${actionId}/detection-evidence`,
+      payload,
+    );
+    return data.data;
+  } catch (error) {
+    throw new Error(
+      getActionsErrorMessage(
+        error,
+        'No se pudo registrar la evidencia de detección. Intenta de nuevo.',
       ),
       { cause: error },
     );

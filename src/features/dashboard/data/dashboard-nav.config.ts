@@ -69,7 +69,7 @@ export const dashboardNavItems: DashboardNavItem[] = [
     shortLabel: 'Usuarios',
     icon: Users,
     showInMobileTab: false,
-    allowedRoles: [ROLE_ADMINISTRATOR],
+    allowedRoles: [ROLE_ADMINISTRATOR, ROLE_INSPECTOR],
   },
 ];
 
@@ -100,7 +100,7 @@ export const dashboardMoreMenuItems: DashboardMoreMenuItem[] = [
     label: 'Usuarios',
     description: 'Gestión de accesos y roles',
     icon: Users,
-    allowedRoles: [ROLE_ADMINISTRATOR],
+    allowedRoles: [ROLE_ADMINISTRATOR, ROLE_INSPECTOR],
   },
   {
     id: 'settings',

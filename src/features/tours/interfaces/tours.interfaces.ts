@@ -1,3 +1,4 @@
+import type { ApiUserPublic } from '@/features/users/interfaces';
 import type { CatalogSelectors } from '@/features/catalog/interfaces/catalog.interfaces';
 import type { TourDetectionFormValues } from './tour-detection.schema';
 import type { TourDetectionType } from './tours-table.interfaces';
@@ -35,9 +36,9 @@ export interface DetectionModalProps {
   readonly detectionCount: number;
   readonly catalog: CatalogSelectors | undefined;
   readonly isCatalogLoading: boolean;
-  readonly responsibleOptions: readonly { value: string; label: string }[];
-  readonly isResponsibleLoading: boolean;
-  readonly isResponsibleError: boolean;
+  readonly allUsers: readonly ApiUserPublic[];
+  readonly isAllUsersLoading: boolean;
+  readonly isAllUsersError: boolean;
   readonly onClose: () => void;
   readonly onSubmit: (values: TourDetectionFormValues) => string;
 }
@@ -48,6 +49,10 @@ export interface TourSessionPanelProps {
   readonly finishError: string | null;
   readonly onAddDetection: () => void;
   readonly onFinishTour: () => void;
+  readonly onUpdateDetectionEvidence: (
+    detectionId: string,
+    evidencePhotoDataUrl: string,
+  ) => void;
 }
 
 export interface ApiResponse<T> {
@@ -67,4 +72,7 @@ export interface CatalogLocationFieldsProps {
   readonly onCompanyChange: (value: string) => void;
   readonly onBranchChange: (value: string) => void;
   readonly onAreaChange: (value: string) => void;
+  readonly responsibleId?: string;
+  readonly onResponsibleChange?: (value: string) => void;
+  readonly responsibleOptions?: readonly { value: string; label: string }[];
 }

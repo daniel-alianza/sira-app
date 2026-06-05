@@ -20,6 +20,16 @@ interface DashboardFilterDateRangeProps {
   label: string;
   value: DashboardDateRangeValue;
   onChange: (value: DashboardDateRangeValue) => void;
+  readonly firstWalkthroughDate?: string | null;
+  readonly onApplyFromFirstWalkthrough?: () => void;
+}
+
+function formatFirstWalkthroughLabel(isoDate: string): string {
+  const parsed = parseISO(isoDate);
+  if (!isValid(parsed)) {
+    return isoDate;
+  }
+  return format(parsed, 'd MMM yyyy', { locale: es });
 }
 
 type PickingField = 'from' | 'to';
@@ -74,6 +84,8 @@ export function DashboardFilterDateRange({
   label,
   value,
   onChange,
+  firstWalkthroughDate,
+  onApplyFromFirstWalkthrough,
 }: DashboardFilterDateRangeProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [pickingField, setPickingField] = useState<PickingField>('from');
@@ -162,11 +174,19 @@ export function DashboardFilterDateRange({
     inRange: 'bg-[#00C4B3]/15 rounded-none',
   };
 
+  const showFirstWalkthroughShortcut =
+    firstWalkthroughDate !== null &&
+    firstWalkthroughDate !== undefined &&
+    firstWalkthroughDate.length > 0 &&
+    onApplyFromFirstWalkthrough !== undefined;
+
   return (
     <div className="min-w-0 space-y-2 text-left">
       <Label htmlFor={id} className={cn(dashboardSubtextClass, 'text-xs font-medium')}>
         {label}
       </Label>
+      <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-stretch">
+      <div className="min-w-0 flex-1">
       <Popover open={isOpen} onOpenChange={setIsOpen}>
         <PopoverTrigger
           id={id}
@@ -235,6 +255,25 @@ export function DashboardFilterDateRange({
           />
         </PopoverContent>
       </Popover>
+      </div>
+      {showFirstWalkthroughShortcut && (
+        <button
+          type="button"
+          onClick={onApplyFromFirstWalkthrough}
+          className={cn(
+            'inline-flex min-h-10 shrink-0 cursor-pointer flex-col justify-center rounded-lg border border-[#00C4B3]/40',
+            'bg-[#00C4B3]/10 px-3 py-2 text-left transition-colors hover:bg-[#00C4B3]/15',
+          )}
+        >
+          <span className="text-[10px] font-semibold uppercase tracking-wide text-[#007a70]">
+            Desde el primer recorrido
+          </span>
+          <span className="text-xs font-medium text-[#0A2240]">
+            {formatFirstWalkthroughLabel(firstWalkthroughDate)}
+          </span>
+        </button>
+      )}
+      </div>
     </div>
   );
 }

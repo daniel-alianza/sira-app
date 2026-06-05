@@ -9,21 +9,6 @@ import { ACTION_STATUS_CONFIG } from '@/features/tours/interfaces';
 import type { ActionDetailStatusPanelProps } from '../interfaces/corrective-action-detail.interfaces';
 import { formatResolutionDuration } from '../utils/format-resolution-duration';
 
-const STATUS_DESCRIPTIONS: Record<
-  ActionDetailStatusPanelProps['status'],
-  string
-> = {
-  pending_acceptance:
-    'El inspector te asignó esta detección. Revisa la evidencia y responde con tu plan de corrección.',
-  open: 'Aceptaste la acción correctiva. Estás en plazo para implementar el plan acordado.',
-  pending: 'La acción está en seguimiento dentro del periodo comprometido.',
-  expired: 'La fecha compromiso venció. Debes reprogramar y firmar un nuevo compromiso.',
-  closure_review: 'El cierre está en revisión por el inspector o supervisor.',
-  closed: 'La acción correctiva fue cerrada satisfactoriamente.',
-  rejected: 'La propuesta o evidencia de cierre fue rechazada.',
-  reopened: 'La acción fue reabierta y requiere nueva atención de tu parte.',
-};
-
 function MetaItem({
   icon: Icon,
   label,
@@ -79,7 +64,7 @@ export function ActionDetailStatusPanel({
             </span>
           </div>
           <p className={cn(dashboardSubtextClass, 'mt-3 text-sm leading-relaxed')}>
-            {STATUS_DESCRIPTIONS[status]}
+            {statusConfig.description}
           </p>
           {resolutionDurationLabel && (
             <div className="mt-4 flex gap-2 rounded-lg border border-[#00C4B3]/30 bg-[#00C4B3]/10 px-3 py-2.5">

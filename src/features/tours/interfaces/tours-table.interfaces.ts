@@ -17,13 +17,18 @@ export interface TourCorrectiveActionRow {
   readonly walkthroughFolio: string;
   readonly detectionFolio: string;
   readonly detectionType: TourDetectionType;
+  readonly description: string;
+  readonly companyName: string;
+  readonly branchName: string;
+  readonly areaName: string;
   readonly status: CorrectiveActionStatus;
   readonly responsible: string;
-  readonly area: string;
   readonly tourDate: string;
   readonly weekdayLabel: string;
   readonly weekdayOrder: number;
   readonly commitmentDate: string | null;
+  readonly evidencePhotoUrl: string | null;
+  readonly resolutionPhotoUrl: string | null;
 }
 
 export interface TourDayGroup {

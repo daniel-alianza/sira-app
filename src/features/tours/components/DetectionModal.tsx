@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { AlertTriangle, CheckCircle2, Loader2, X } from 'lucide-react';
@@ -26,6 +26,7 @@ import {
   type DetectionModalProps,
   type TourDetectionFormValues,
 } from '../interfaces';
+import { toCatalogSelectOptions } from '@/features/users/utils/catalog-select-options';
 import { CatalogLocationFields } from './CatalogLocationFields';
 
 const emptyDetectionValues: TourDetectionFormValues = {
@@ -44,9 +45,9 @@ export function DetectionModal({
   detectionCount,
   catalog,
   isCatalogLoading,
-  responsibleOptions,
-  isResponsibleLoading,
-  isResponsibleError,
+  allUsers,
+  isAllUsersLoading,
+  isAllUsersError,
   onClose,
   onSubmit,
 }: DetectionModalProps) {
@@ -70,6 +71,21 @@ export function DetectionModal({
   const companyId = watch('companyId');
   const branchId = watch('branchId');
   const areaId = watch('areaId');
+  const responsibleId = watch('responsibleId');
+
+  const filteredResponsibleOptions = useMemo(() => {
+    if (!companyId || !branchId || !areaId) return [];
+    return toCatalogSelectOptions(
+      allUsers
+        .filter(
+          (u) =>
+            u.companyId === companyId &&
+            u.branchId === branchId &&
+            u.areaId === areaId,
+        )
+        .map((u) => ({ id: u.id, name: u.name })),
+    );
+  }, [allUsers, companyId, branchId, areaId]);
 
   useEffect(() => {
     if (open) {
@@ -167,6 +183,11 @@ export function DetectionModal({
                 onCompanyChange={(value) => setValue('companyId', value, { shouldValidate: true })}
                 onBranchChange={(value) => setValue('branchId', value, { shouldValidate: true })}
                 onAreaChange={(value) => setValue('areaId', value, { shouldValidate: true })}
+                responsibleId={responsibleId}
+                responsibleOptions={filteredResponsibleOptions}
+                onResponsibleChange={(value) =>
+                  setValue('responsibleId', value, { shouldValidate: true })
+                }
               />
             )}
 
@@ -222,6 +243,7 @@ export function DetectionModal({
                 title="Subir foto de evidencia"
                 description="JPG, PNG o WEBP · máx. 5 MB · opcional"
                 previewAlt="Vista previa de evidencia del inspector"
+                helperText={null}
                 previewUrl={evidencePreviewUrl}
                 onChange={(dataUrl, previewUrl) => {
                   setValue('evidencePhotoDataUrl', dataUrl ?? undefined, {
@@ -232,55 +254,6 @@ export function DetectionModal({
               />
             </div>
 
-            <div className="space-y-1.5">
-              <Label htmlFor="responsibleId">Responsable</Label>
-              {isResponsibleLoading && (
-                <div className="flex items-center gap-2 text-sm text-slate-500">
-                  <Loader2 className="size-4 animate-spin" />
-                  Cargando responsables…
-                </div>
-              )}
-              {!isResponsibleLoading && isResponsibleError && (
-                <div className="flex items-center gap-2 rounded-lg border border-destructive/30 bg-destructive/10 px-3 py-2 text-sm text-destructive">
-                  <AlertTriangle className="size-4 shrink-0" />
-                  No se pudieron cargar los responsables.
-                </div>
-              )}
-              {!isResponsibleLoading && !isResponsibleError && (
-                <Controller
-                  name="responsibleId"
-                  control={control}
-                  render={({ field }) => (
-                    <Select
-                      value={field.value}
-                      items={[...responsibleOptions]}
-                      onValueChange={(value) => field.onChange(value ?? '')}
-                      disabled={responsibleOptions.length === 0}
-                    >
-                      <SelectTrigger id="responsibleId" className="w-full">
-                        <SelectValue
-                          placeholder={
-                            responsibleOptions.length > 0
-                              ? 'Seleccionar responsable'
-                              : 'Sin responsables disponibles'
-                          }
-                        />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {responsibleOptions.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
-                            {option.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  )}
-                />
-              )}
-              {errors.responsibleId && (
-                <p className="text-xs text-destructive">{errors.responsibleId.message}</p>
-              )}
-            </div>
           </div>
 
           <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 border-t border-slate-200/90 bg-slate-50/50 px-6 py-4">
@@ -292,10 +265,9 @@ export function DetectionModal({
               disabled={
                 isSubmitting ||
                 isCatalogLoading ||
-                isResponsibleLoading ||
-                isResponsibleError ||
-                !catalog ||
-                responsibleOptions.length === 0
+                isAllUsersLoading ||
+                isAllUsersError ||
+                !catalog
               }
               className={cn(dashboardButtonPrimary(), 'disabled:opacity-50')}
             >

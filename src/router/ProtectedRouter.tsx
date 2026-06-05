@@ -30,7 +30,9 @@ export const ProtectedRouter: RouteObject[] = [
           {
             path: 'users',
             element: (
-              <RoleRouteGuard allowedRoles={[ROLE_ADMINISTRATOR]}>
+              <RoleRouteGuard
+                allowedRoles={[ROLE_ADMINISTRATOR, ROLE_INSPECTOR]}
+              >
                 <UsersPage />
               </RoleRouteGuard>
             ),

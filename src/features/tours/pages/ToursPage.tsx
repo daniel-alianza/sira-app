@@ -46,9 +46,9 @@ export function ToursPage() {
         detectionCount={activeSession?.detections.length ?? 0}
         catalog={catalogQuery.data}
         isCatalogLoading={catalogQuery.isLoading}
-        responsibleOptions={responsibleQuery.options}
-        isResponsibleLoading={responsibleQuery.isLoading}
-        isResponsibleError={responsibleQuery.isError}
+        allUsers={responsibleQuery.data}
+        isAllUsersLoading={responsibleQuery.isLoading}
+        isAllUsersError={responsibleQuery.isError}
         onClose={closeDetectionModal}
         onSubmit={handleDetectionSubmit}
       />

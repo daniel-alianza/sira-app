@@ -34,6 +34,10 @@ interface UseTourSessionResult {
     catalog: CatalogSelectors,
     responsibleOptions: readonly CatalogSelectOption[],
   ) => string;
+  readonly updateDetectionEvidence: (
+    detectionId: string,
+    evidencePhotoDataUrl: string,
+  ) => void;
 }
 
 export function useTourSession(): UseTourSessionResult {
@@ -104,6 +108,26 @@ export function useTourSession(): UseTourSessionResult {
     [],
   );
 
+  const updateDetectionEvidence = useCallback(
+    (detectionId: string, evidencePhotoDataUrl: string) => {
+      setActiveSession((current) => {
+        if (!current) {
+          return current;
+        }
+
+        return {
+          ...current,
+          detections: current.detections.map((detection) =>
+            detection.id === detectionId
+              ? { ...detection, evidencePhotoDataUrl }
+              : detection,
+          ),
+        };
+      });
+    },
+    [],
+  );
+
   return {
     activeSession,
     detectionModalOpen,
@@ -113,5 +137,6 @@ export function useTourSession(): UseTourSessionResult {
     openDetectionModal,
     closeDetectionModal,
     registerDetection,
+    updateDetectionEvidence,
   };
 }

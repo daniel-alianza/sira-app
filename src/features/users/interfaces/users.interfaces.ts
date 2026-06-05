@@ -113,7 +113,8 @@ export interface CatalogFilterSelectProps {
 }
 
 export interface UsersPageHeaderProps {
-  onCreateClick: () => void;
+  readonly canManageUsers: boolean;
+  readonly onCreateClick?: () => void;
 }
 
 export interface UsersStatsSectionProps {
@@ -141,12 +142,14 @@ export interface UsersTableProps {
   users: User[];
   totalCount: number;
   hasActiveFilters: boolean;
+  canManageUsers: boolean;
   onEdit: (user: User) => void;
   onToggleActive: (user: User) => void;
 }
 
 export interface UsersTableRowProps {
   user: User;
+  canManageUsers: boolean;
   onEdit: (user: User) => void;
   onToggleActive: (user: User) => void;
 }

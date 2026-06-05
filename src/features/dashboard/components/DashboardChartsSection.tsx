@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
 import { cn } from '@/lib/utils';
-import type { DashboardCharts } from '../interfaces';
+import type { DashboardCharts, DashboardComplianceByAreaChartItem } from '../interfaces';
 import { dashboardCard, dashboardHeadingClass, dashboardSubtextClass } from './dashboard-ui.classes';
 
 function ChartCard({ title, children }: { title: string; children: ReactNode }) {
@@ -104,13 +104,31 @@ function ActionsTrendChart({
   );
 }
 
-function AreaBarChart({
+function getComplianceBarColor(compliance: number): string {
+  if (compliance >= 85) {
+    return 'bg-emerald-500';
+  }
+  if (compliance >= 75) {
+    return 'bg-[#00C4B3]';
+  }
+  return 'bg-orange-500';
+}
+
+function getComplianceTextColor(compliance: number): string {
+  if (compliance >= 85) {
+    return 'text-emerald-700';
+  }
+  if (compliance >= 75) {
+    return 'text-[#007a70]';
+  }
+  return 'text-orange-700';
+}
+
+function AreaCompliancePercentChart({
   data,
 }: {
-  readonly data: DashboardCharts['complianceByArea'];
+  readonly data: readonly DashboardComplianceByAreaChartItem[];
 }) {
-  const maxValue = 100;
-
   if (data.length === 0) {
     return (
       <p className={cn(dashboardSubtextClass, 'py-8 text-center text-sm')}>
@@ -120,24 +138,42 @@ function AreaBarChart({
   }
 
   return (
-    <div className="flex h-[180px] items-end justify-between gap-1 pt-2 sm:h-[200px] sm:gap-2 sm:pt-4">
-      {data.map((item) => (
-        <div key={item.label} className="flex flex-1 flex-col items-center gap-2">
-          <div className="flex w-full max-w-[40px] flex-col justify-end gap-0.5" style={{ height: '140px' }}>
-            <div
-              className="w-full rounded-t-md bg-[#FF4D00]"
-              style={{ height: `${(item.nonCompliance / maxValue) * 100}%`, minHeight: '4px' }}
-            />
-            <div
-              className="w-full rounded-t-md bg-[#00C4B3]"
-              style={{ height: `${(item.compliance / maxValue) * 100}%`, minHeight: '8px' }}
-            />
-          </div>
-          <span className="max-w-[48px] truncate text-center text-[9px] font-medium text-slate-600 sm:max-w-none sm:text-[10px]">
-            {item.label}
-          </span>
-        </div>
-      ))}
+    <div className="space-y-4">
+      <p className={cn(dashboardSubtextClass, 'text-xs')}>
+        Porcentaje de acciones cerradas sobre el total por área en el periodo filtrado.
+      </p>
+      <ul className="space-y-3.5">
+        {data.map((item) => (
+          <li key={item.label} className="space-y-1.5">
+            <div className="flex items-baseline justify-between gap-3">
+              <span className="min-w-0 truncate text-sm font-medium text-[#0A2240]">
+                {item.label}
+              </span>
+              <span
+                className={cn(
+                  'shrink-0 text-lg font-semibold tabular-nums',
+                  getComplianceTextColor(item.compliance),
+                )}
+              >
+                {item.compliance}%
+              </span>
+            </div>
+            <div className="relative h-3 overflow-hidden rounded-full bg-slate-100">
+              <div
+                className={cn(
+                  'absolute inset-y-0 left-0 rounded-full transition-[width]',
+                  getComplianceBarColor(item.compliance),
+                )}
+                style={{ width: `${item.compliance}%` }}
+              />
+            </div>
+            <p className={cn(dashboardSubtextClass, 'text-[11px]')}>
+              {item.closedActions} de {item.actionsTotal} acciones cerradas
+              {item.nonCompliance > 0 ? ` · ${item.nonCompliance}% pendiente de cierre` : ''}
+            </p>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
@@ -258,15 +294,19 @@ export function DashboardChartsSection({ charts, isLoading }: DashboardChartsSec
         <UpcomingDueChart data={charts.upcomingDue} />
       </ChartCard>
       <ChartCard title="Cumplimiento por área recorrida">
-        <AreaBarChart data={charts.complianceByArea} />
-        <div className={cn(dashboardSubtextClass, 'mt-3 flex justify-center gap-4')}>
+        <AreaCompliancePercentChart data={charts.complianceByArea} />
+        <div className={cn(dashboardSubtextClass, 'mt-4 flex flex-wrap justify-center gap-x-4 gap-y-1 text-[11px]')}>
           <span className="flex items-center gap-1.5">
-            <span className="size-2 rounded-sm bg-[#00C4B3]" />
-            Cumplimiento
+            <span className="size-2 rounded-full bg-emerald-500" />
+            ≥ 85% cumplimiento
           </span>
           <span className="flex items-center gap-1.5">
-            <span className="size-2 rounded-sm bg-[#FF4D00]" />
-            No cumplimiento
+            <span className="size-2 rounded-full bg-[#00C4B3]" />
+            75–84%
+          </span>
+          <span className="flex items-center gap-1.5">
+            <span className="size-2 rounded-full bg-orange-500" />
+            &lt; 75%
           </span>
         </div>
       </ChartCard>

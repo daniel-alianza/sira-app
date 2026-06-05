@@ -6,6 +6,7 @@ export type {
   DashboardAiSummary,
   DashboardAreaComplianceItem,
   DashboardCharts,
+  DashboardComplianceByAreaChartItem,
   DashboardCommitmentDateRequestItem,
   DashboardDateRangeValue,
   DashboardFilterOption,

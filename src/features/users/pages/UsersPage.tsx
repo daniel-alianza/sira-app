@@ -1,5 +1,7 @@
 import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAuthStore } from '@/features/auth/store/auth.store';
+import { canManageUsers } from '@/features/auth/utils/role-permissions';
 import { dashboardCard } from '@/features/dashboard/components/dashboard-ui.classes';
 import {
   UserConfirmDialog,
@@ -12,6 +14,8 @@ import {
 import { useUsersPage } from '../hooks';
 
 export function UsersPage() {
+  const roleName = useAuthStore((state) => state.user?.role?.name);
+  const canManage = canManageUsers(roleName);
   const {
     users,
     catalog,
@@ -51,7 +55,10 @@ export function UsersPage() {
 
   return (
     <div className="w-full space-y-5 md:space-y-6">
-      <UsersPageHeader onCreateClick={openCreateModal} />
+      <UsersPageHeader
+        canManageUsers={canManage}
+        onCreateClick={canManage ? openCreateModal : undefined}
+      />
 
       <UsersStatsSection
         total={stats.total}
@@ -94,6 +101,7 @@ export function UsersPage() {
           users={filteredUsers}
           totalCount={users.length}
           hasActiveFilters={hasActiveFilters}
+          canManageUsers={canManage}
           onEdit={openEditModal}
           onToggleActive={openConfirm}
         />

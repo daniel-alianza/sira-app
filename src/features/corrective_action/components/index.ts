@@ -6,6 +6,7 @@ export { ActionDetailPhoto } from './ActionDetailPhoto';
 export { ActionDetailRespondForm } from './ActionDetailRespondForm';
 export { ActionDetailCommitmentHistory } from './ActionDetailCommitmentHistory';
 export { ActionDetailClosureReviewForm } from './ActionDetailClosureReviewForm';
+export { ActionDetailDetectionEvidenceForm } from './ActionDetailDetectionEvidenceForm';
 export { ActionDetailResolutionForm } from './ActionDetailResolutionForm';
 export { ActionDetailStatusPanel } from './ActionDetailStatusPanel';
 export { ActionResolutionPhotoUpload } from './ActionResolutionPhotoUpload';

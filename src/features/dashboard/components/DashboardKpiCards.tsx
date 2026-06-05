@@ -10,8 +10,14 @@ import {
   Route,
   UserX,
 } from 'lucide-react';
+import { useNavigate } from 'react-router';
 import { cn } from '@/lib/utils';
-import type { DashboardKpis } from '../interfaces';
+import type { DashboardFiltersState, DashboardKpis } from '../interfaces';
+import {
+  buildDashboardKpiSearchParams,
+  getDashboardKpiNavigationPath,
+  type DashboardKpiNavigationId,
+} from '../data/dashboard-kpi-navigation.config';
 import {
   dashboardCardInteractive,
   dashboardSubtextClass,
@@ -25,39 +31,66 @@ const toneStyles = {
   danger: 'bg-orange-50 text-orange-700',
 };
 
-function buildKpiItems(kpis: DashboardKpis) {
+interface DashboardKpiItem {
+  readonly id: DashboardKpiNavigationId;
+  readonly label: string;
+  readonly value: number;
+  readonly icon: typeof ClipboardList;
+  readonly tone: keyof typeof toneStyles;
+}
+
+function buildKpiItems(kpis: DashboardKpis): DashboardKpiItem[] {
   return [
-    { id: 'total', label: 'Acciones creadas', value: kpis.totalActions, icon: ClipboardList, tone: 'default' as const },
-    { id: 'open', label: 'Abiertas', value: kpis.openActions, icon: FolderOpen, tone: 'default' as const },
-    { id: 'closed', label: 'Cerradas', value: kpis.closedActions, icon: CheckCircle2, tone: 'success' as const },
-    { id: 'pending-accept', label: 'Pend. de aceptación', value: kpis.pendingAcceptance, icon: UserX, tone: 'warning' as const },
-    { id: 'expired', label: 'Expiradas', value: kpis.expiredActions, icon: AlertTriangle, tone: 'danger' as const },
-    { id: 'closure-review', label: 'En rev. de cierre', value: kpis.closureReview, icon: FileSearch, tone: 'default' as const },
-    { id: 'rejected', label: 'Rechazadas', value: kpis.rejectedClosures, icon: Clock, tone: 'danger' as const },
-    { id: 'walkthroughs', label: 'Recorridos (periodo)', value: kpis.walkthroughsPeriod, icon: Route, tone: 'default' as const },
-    { id: 'not-responded', label: 'No han contestado', value: kpis.notRespondedUsers, icon: MessageCircleOff, tone: 'warning' as const },
-    { id: 'not-signed', label: 'No han firmado', value: kpis.notSignedUsers, icon: PenOff, tone: 'warning' as const },
+    { id: 'total', label: 'Acciones creadas', value: kpis.totalActions, icon: ClipboardList, tone: 'default' },
+    { id: 'open', label: 'Abiertas', value: kpis.openActions, icon: FolderOpen, tone: 'default' },
+    { id: 'closed', label: 'Cerradas', value: kpis.closedActions, icon: CheckCircle2, tone: 'success' },
+    { id: 'pending-accept', label: 'Pend. de aceptación', value: kpis.pendingAcceptance, icon: UserX, tone: 'warning' },
+    { id: 'expired', label: 'Expiradas', value: kpis.expiredActions, icon: AlertTriangle, tone: 'danger' },
+    { id: 'closure-review', label: 'En rev. de cierre', value: kpis.closureReview, icon: FileSearch, tone: 'default' },
+    { id: 'rejected', label: 'Rechazadas', value: kpis.rejectedClosures, icon: Clock, tone: 'danger' },
+    { id: 'walkthroughs', label: 'Recorridos (periodo)', value: kpis.walkthroughsPeriod, icon: Route, tone: 'default' },
+    { id: 'not-responded', label: 'No han contestado', value: kpis.notRespondedUsers, icon: MessageCircleOff, tone: 'warning' },
+    { id: 'not-signed', label: 'No han firmado', value: kpis.notSignedUsers, icon: PenOff, tone: 'warning' },
   ];
 }
 
 export interface DashboardKpiCardsProps {
   readonly kpis: DashboardKpis;
+  readonly filters: DashboardFiltersState;
   readonly isLoading: boolean;
 }
 
-export function DashboardKpiCards({ kpis, isLoading }: DashboardKpiCardsProps) {
+export function DashboardKpiCards({ kpis, filters, isLoading }: DashboardKpiCardsProps) {
+  const navigate = useNavigate();
   const items = buildKpiItems(kpis);
+
+  function handleKpiClick(kpiId: DashboardKpiNavigationId, value: number) {
+    if (isLoading || value === 0) {
+      return;
+    }
+
+    const pathname = getDashboardKpiNavigationPath(kpiId);
+    const search = buildDashboardKpiSearchParams(kpiId, filters);
+    navigate({ pathname, search });
+  }
 
   return (
     <div className="grid grid-cols-2 gap-2.5 sm:gap-3 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-8">
       {items.map((kpi) => {
         const Icon = kpi.icon;
+        const isDisabled = isLoading || kpi.value === 0;
+
         return (
           <button
             key={kpi.id}
             type="button"
-            className={cn(dashboardCardInteractive(), 'group w-full text-left')}
-            disabled={isLoading}
+            onClick={() => handleKpiClick(kpi.id, kpi.value)}
+            className={cn(
+              dashboardCardInteractive(),
+              'group w-full text-left',
+              isDisabled && 'cursor-not-allowed opacity-60 hover:translate-y-0 hover:shadow-none',
+            )}
+            disabled={isDisabled}
           >
             <div className="space-y-2 p-3 sm:space-y-3 sm:p-4">
               <div className={cn('flex size-8 items-center justify-center rounded-lg sm:size-9', toneStyles[kpi.tone])}>

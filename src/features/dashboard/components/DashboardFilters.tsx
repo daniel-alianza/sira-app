@@ -48,26 +48,31 @@ function DashboardFilterSelect({
   onValueChange,
   options,
 }: DashboardFilterSelectProps) {
-  const items = options.map((option) => ({
+  const selectItems = options.map((option) => ({
     value: option.value,
     label: option.label,
   }));
+
+  const selectedLabel =
+    options.find((option) => option.value === value)?.label ?? options[0]?.label ?? '';
+
+  function handleValueChange(nextValue: string | null) {
+    if (typeof nextValue === 'string' && nextValue.length > 0) {
+      onValueChange(nextValue);
+    }
+  }
 
   return (
     <div className="min-w-0 space-y-2 text-left">
       <Label htmlFor={id} className={cn(dashboardSubtextClass, 'text-xs font-medium')}>
         {label}
       </Label>
-      <Select
-        value={value}
-        onValueChange={(nextValue) => onValueChange(nextValue ?? options[0]?.value ?? 'all')}
-        items={items}
-      >
+      <Select value={value} onValueChange={handleValueChange} items={selectItems}>
         <SelectTrigger
           id={id}
           className="h-10 w-full min-w-0 bg-white text-[#0A2240] shadow-sm dark:bg-white [&_[data-slot=select-value]]:truncate"
         >
-          <SelectValue />
+          <SelectValue>{selectedLabel}</SelectValue>
         </SelectTrigger>
         <SelectContent>
           {options.map((option) => (
@@ -119,6 +124,8 @@ export interface DashboardFiltersProps {
   readonly onActivityChange: (value: string) => void;
   readonly onStatusChange: (value: string) => void;
   readonly onDateRangeChange: (value: DashboardDateRangeValue) => void;
+  readonly firstWalkthroughDate?: string | null;
+  readonly onApplyFromFirstWalkthrough?: () => void;
 }
 
 export function DashboardFilters({
@@ -137,6 +144,8 @@ export function DashboardFilters({
   onActivityChange,
   onStatusChange,
   onDateRangeChange,
+  firstWalkthroughDate,
+  onApplyFromFirstWalkthrough,
 }: DashboardFiltersProps) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -170,10 +179,10 @@ export function DashboardFilters({
 
       <CardHeader className="hidden border-b border-slate-100 px-5 pt-5 pb-4 md:flex md:px-6">
         <div className="flex items-center gap-2">
-          <div className="flex size-8 items-center justify-center rounded-lg bg-[#00C4B3]/15">
+          <div className="flex size-8 shrink-0 items-center justify-center rounded-lg bg-[#00C4B3]/15">
             <Filter className="size-4 text-[#00a896]" />
           </div>
-          <div className="space-y-0.5">
+          <div className="min-w-0 space-y-0.5">
             <CardTitle className={cn(dashboardHeadingClass, 'text-sm')}>
               Filtros de consulta
             </CardTitle>
@@ -257,6 +266,8 @@ export function DashboardFilters({
                   label="Rango fechas"
                   value={dateRange}
                   onChange={onDateRangeChange}
+                  firstWalkthroughDate={firstWalkthroughDate}
+                  onApplyFromFirstWalkthrough={onApplyFromFirstWalkthrough}
                 />
               </MobileFilterField>
             </div>
