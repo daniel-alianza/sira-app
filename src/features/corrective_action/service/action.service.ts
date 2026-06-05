@@ -50,35 +50,28 @@ function sanitizeActionsQueryParams(
     return undefined;
   }
 
-  const params: ActionsQueryParams = {};
-  let hasAny = false;
+  const params: ActionsQueryParams = {
+    ...(queryParams.companyId && isActionsListUuid(queryParams.companyId)
+      ? { companyId: queryParams.companyId }
+      : {}),
+    ...(queryParams.areaId && isActionsListUuid(queryParams.areaId)
+      ? { areaId: queryParams.areaId }
+      : {}),
+    ...(queryParams.branchId && isActionsListUuid(queryParams.branchId)
+      ? { branchId: queryParams.branchId }
+      : {}),
+    ...(queryParams.responsibleId && isActionsListUuid(queryParams.responsibleId)
+      ? { responsibleId: queryParams.responsibleId }
+      : {}),
+    ...(queryParams.dateFrom && isActionsListIsoDate(queryParams.dateFrom)
+      ? { dateFrom: queryParams.dateFrom }
+      : {}),
+    ...(queryParams.dateTo && isActionsListIsoDate(queryParams.dateTo)
+      ? { dateTo: queryParams.dateTo }
+      : {}),
+  };
 
-  if (queryParams.companyId && isActionsListUuid(queryParams.companyId)) {
-    params.companyId = queryParams.companyId;
-    hasAny = true;
-  }
-  if (queryParams.areaId && isActionsListUuid(queryParams.areaId)) {
-    params.areaId = queryParams.areaId;
-    hasAny = true;
-  }
-  if (queryParams.branchId && isActionsListUuid(queryParams.branchId)) {
-    params.branchId = queryParams.branchId;
-    hasAny = true;
-  }
-  if (queryParams.responsibleId && isActionsListUuid(queryParams.responsibleId)) {
-    params.responsibleId = queryParams.responsibleId;
-    hasAny = true;
-  }
-  if (queryParams.dateFrom && isActionsListIsoDate(queryParams.dateFrom)) {
-    params.dateFrom = queryParams.dateFrom;
-    hasAny = true;
-  }
-  if (queryParams.dateTo && isActionsListIsoDate(queryParams.dateTo)) {
-    params.dateTo = queryParams.dateTo;
-    hasAny = true;
-  }
-
-  return hasAny ? params : undefined;
+  return Object.keys(params).length > 0 ? params : undefined;
 }
 
 export async function fetchMyCorrectiveActions(

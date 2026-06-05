@@ -47,35 +47,16 @@ const FILTER_INITIAL: ActionsQueryParams = {
 function buildApiQueryParams(
   filters: ActionsQueryParams,
 ): ActionsQueryParams | undefined {
-  const params: ActionsQueryParams = {};
-  let hasAny = false;
+  const params: ActionsQueryParams = {
+    ...(filters.companyId ? { companyId: filters.companyId } : {}),
+    ...(filters.areaId ? { areaId: filters.areaId } : {}),
+    ...(filters.branchId ? { branchId: filters.branchId } : {}),
+    ...(filters.responsibleId ? { responsibleId: filters.responsibleId } : {}),
+    ...(filters.dateFrom ? { dateFrom: filters.dateFrom } : {}),
+    ...(filters.dateTo ? { dateTo: filters.dateTo } : {}),
+  };
 
-  if (filters.companyId) {
-    params.companyId = filters.companyId;
-    hasAny = true;
-  }
-  if (filters.areaId) {
-    params.areaId = filters.areaId;
-    hasAny = true;
-  }
-  if (filters.branchId) {
-    params.branchId = filters.branchId;
-    hasAny = true;
-  }
-  if (filters.responsibleId) {
-    params.responsibleId = filters.responsibleId;
-    hasAny = true;
-  }
-  if (filters.dateFrom) {
-    params.dateFrom = filters.dateFrom;
-    hasAny = true;
-  }
-  if (filters.dateTo) {
-    params.dateTo = filters.dateTo;
-    hasAny = true;
-  }
-
-  return hasAny ? params : undefined;
+  return Object.keys(params).length > 0 ? params : undefined;
 }
 
 export function useActionsPage() {

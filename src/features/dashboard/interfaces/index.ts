@@ -12,6 +12,7 @@ export type {
   DashboardFilterOption,
   DashboardFiltersState,
   DashboardKpis,
+  DashboardOpenActionItem,
   DashboardOperationalQueues,
   DashboardOverview,
   DashboardQueryParams,

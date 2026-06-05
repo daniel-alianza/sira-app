@@ -24,6 +24,7 @@ export function ToursPage() {
     handleDetectionSubmit,
     handleStartTour,
     handleFinishTour,
+    updateDetectionEvidence,
   } = useToursPage();
 
   return (
@@ -37,6 +38,7 @@ export function ToursPage() {
           finishError={finishError}
           onAddDetection={openDetectionModal}
           onFinishTour={handleFinishTour}
+          onUpdateDetectionEvidence={updateDetectionEvidence}
         />
       )}
 
