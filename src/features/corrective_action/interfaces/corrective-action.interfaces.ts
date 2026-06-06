@@ -10,6 +10,8 @@ export type ActionStatusFilter = CorrectiveActionStatus | 'all';
 
 export type ActionsListStatusGroup = 'all' | 'active';
 
+export type ActionsListQueue = 'not-signed';
+
 export interface CorrectiveActionItem {
   readonly id: string;
   readonly detectionFolio: string;
@@ -25,6 +27,9 @@ export interface CorrectiveActionItem {
   readonly commitmentSequence: number | null;
   readonly assignedAt: string;
   readonly tourDate: string;
+  readonly weekdayLabel: string;
+  readonly weekdayOrder: number;
+  readonly responsibleName: string;
   readonly evidencePhotoUrl: string | null;
   readonly resolutionPhotoUrl: string | null;
 }
@@ -58,6 +63,26 @@ export interface ActionsStatusFiltersProps {
 export interface ActionsTableProps {
   readonly actions: CorrectiveActionItem[];
   readonly onViewDetail: (action: CorrectiveActionItem) => void;
+  readonly showNotifyActions?: boolean;
+  readonly notifyingActionId?: string | null;
+  readonly onNotifyAction?: (action: CorrectiveActionItem) => void;
+  readonly showDirectCloseActions?: boolean;
+  readonly onDirectCloseAction?: (action: CorrectiveActionItem) => void;
+}
+
+export interface NotifyCorrectiveActionResult {
+  readonly actionId: string;
+  readonly responsibleEmail: string;
+}
+
+export interface NotifyCorrectiveActionsBulkResult {
+  readonly notifiedCount: number;
+  readonly skippedCount: number;
+}
+
+export interface DirectCloseCorrectiveActionResult {
+  readonly id: string;
+  readonly status: CorrectiveActionStatus;
 }
 
 export interface RespondCorrectiveActionPayload {

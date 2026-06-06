@@ -15,6 +15,7 @@ export type {
   UserCatalog,
   UserConfirmDialogProps,
   UserFormValues,
+  UserEditScope,
   UserModalProps,
   UsersEmptyStateProps,
   UsersFiltersToolbarProps,

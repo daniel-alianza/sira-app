@@ -1,13 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
-import { ClipboardList, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router';
+import { DetectionListRow } from '@/components/DetectionListRow';
 import { cn } from '@/lib/utils';
 import {
   dashboardCard,
   dashboardHeadingClass,
   dashboardSubtextClass,
 } from '@/features/dashboard/components/dashboard-ui.classes';
-import { DETECTION_TYPE_LABELS, DETECTION_TYPE_STYLES } from '@/features/tours/interfaces';
+import { ACTION_STATUS_CONFIG } from '@/features/tours/interfaces';
 import {
   CORRECTIVE_ACTIONS_QUERY_KEY,
   type CorrectiveActionItem,
@@ -102,7 +103,7 @@ export function UnifiedWalkthroughAndActionsPage() {
               Acciones correctivas activas
             </h2>
             <p className={cn(dashboardSubtextClass, 'mt-0.5 text-xs')}>
-              Seguimiento de acciones correctivas abiertas
+              Fotografías, detalle del hallazgo, ubicación y estatus
             </p>
           </div>
           <button
@@ -122,47 +123,42 @@ export function UnifiedWalkthroughAndActionsPage() {
         )}
 
         {!actionsQuery.isLoading && !actionsQuery.isError && pendingActions.length === 0 && (
-          <div className="flex flex-col items-center justify-center px-6 py-12 text-center">
-            <ClipboardList className="size-10 text-[#0A2240]/30" />
-            <p className={cn(dashboardSubtextClass, 'mt-2 text-sm')}>
-              Sin acciones activas
-            </p>
-          </div>
+          <p className={cn(dashboardSubtextClass, 'px-6 py-12 text-center text-sm')}>
+            Sin acciones activas
+          </p>
         )}
 
         {!actionsQuery.isLoading && !actionsQuery.isError && pendingActions.length > 0 && (
-          <div className="divide-y divide-slate-100">
-            {pendingActions.map((action: CorrectiveActionItem) => (
-              <button
-                key={action.id}
-                type="button"
-                onClick={() => handleActionClick(action)}
-                className="flex w-full items-start gap-3 px-4 py-3 text-left transition-colors hover:bg-slate-50 md:px-6"
-              >
-                <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-[#0A2240]/5">
-                  <ClipboardList className="size-4 text-[#0A2240]/60" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-mono text-xs font-semibold text-[#00a896]">
-                      {action.detectionFolio}
-                    </span>
-                    <span className={cn(
-                      'inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium',
-                      DETECTION_TYPE_STYLES[action.detectionType],
-                    )}>
-                      {DETECTION_TYPE_LABELS[action.detectionType]}
-                    </span>
-                  </div>
-                  <p className="mt-0.5 line-clamp-1 text-sm text-[#0A2240]">{action.description}</p>
-                  <p className="mt-0.5 text-xs text-slate-500">
-                    {action.companyName} · {action.areaName}
-                  </p>
-                </div>
-                <span className="shrink-0 text-xs text-slate-400">{action.assignedAt}</span>
-              </button>
-            ))}
-          </div>
+          <>
+            <div className="divide-y divide-slate-100">
+              {pendingActions.map((action: CorrectiveActionItem) => {
+                const status = ACTION_STATUS_CONFIG[action.status];
+
+                return (
+                  <DetectionListRow
+                    key={action.id}
+                    detectionFolio={action.detectionFolio}
+                    walkthroughFolio={action.walkthroughFolio}
+                    description={action.description}
+                    companyName={action.companyName}
+                    branchName={action.branchName}
+                    areaName={action.areaName}
+                    evidencePhotoUrl={action.evidencePhotoUrl}
+                    resolutionPhotoUrl={action.resolutionPhotoUrl}
+                    detectionType={action.detectionType}
+                    status={status}
+                    footerLine={`Recorrido: ${action.tourDate} · ${action.responsibleName}`}
+                    onViewDetail={() => handleActionClick(action)}
+                  />
+                );
+              })}
+            </div>
+
+            <div className="border-t border-slate-200/90 bg-slate-50/50 px-4 py-2.5 text-xs text-slate-500 md:px-6">
+              Mostrando {pendingActions.length}{' '}
+              {pendingActions.length === 1 ? 'acción' : 'acciones'}
+            </div>
+          </>
         )}
       </div>
     </div>

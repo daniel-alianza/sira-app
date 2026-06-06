@@ -72,15 +72,26 @@ export async function createUser(values: UserFormValues): Promise<ApiUserPublic>
   }
 }
 
-export function buildUpdateUserPayload(values: UserFormValues): UpdateUserRequest {
-  return {
+export function buildUpdateUserPayload(
+  values: UserFormValues,
+  editScope: 'full' | 'inspector' = 'full',
+): UpdateUserRequest {
+  const basePayload: UpdateUserRequest = {
     name: values.name,
     email: values.email,
     empresaId: values.companyId,
     sucursalId: values.branchId,
     areaId: values.areaId,
+    ...(values.password ? { password: values.password } : {}),
+  };
+
+  if (editScope === 'inspector') {
+    return basePayload;
+  }
+
+  return {
+    ...basePayload,
     roleId: values.roleId,
     isActive: values.isActive,
-    ...(values.password ? { password: values.password } : {}),
   };
 }

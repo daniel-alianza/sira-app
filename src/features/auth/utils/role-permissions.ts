@@ -22,6 +22,39 @@ export function canManageUsers(roleName?: string): boolean {
   return roleName === ROLE_ADMINISTRATOR;
 }
 
+export function canEditInspectorUsers(roleName?: string): boolean {
+  return roleName === ROLE_ADMINISTRATOR || roleName === ROLE_INSPECTOR;
+}
+
+export function canEditUser(
+  sessionRoleName: string | undefined,
+  targetRoleName: string | undefined,
+): boolean {
+  if (sessionRoleName === ROLE_ADMINISTRATOR) {
+    return true;
+  }
+
+  if (sessionRoleName === ROLE_INSPECTOR) {
+    return targetRoleName === ROLE_INSPECTOR;
+  }
+
+  return false;
+}
+
+export function canToggleUserActive(roleName?: string): boolean {
+  return roleName === ROLE_ADMINISTRATOR;
+}
+
+import { SHE_AREA_NAME } from '@/features/corrective_action/interfaces/she-area.constants';
+
+export function canDirectCloseSheActions(areaName?: string): boolean {
+  return areaName === SHE_AREA_NAME;
+}
+
+export function canEditUsers(roleName?: string): boolean {
+  return canAccessUsers(roleName);
+}
+
 export function canAccessTours(roleName?: string): boolean {
   return roleName === ROLE_ADMINISTRATOR || roleName === ROLE_INSPECTOR;
 }

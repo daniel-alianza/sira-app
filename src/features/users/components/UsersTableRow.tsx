@@ -1,23 +1,26 @@
-import { Building2, MapPin, Pencil, Power, PowerOff, Shield } from 'lucide-react';
+import { Building2, MapPin, Shield } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { Button } from '@/components/ui/button';
 import { RoleBadge } from './RoleBadge';
 import { StatusBadge } from './StatusBadge';
 import { UserAvatar } from './UserAvatar';
+import { UsersRowActionsMenu } from './UsersRowActionsMenu';
 import type { UsersTableRowProps } from '../interfaces';
 
 export function UsersTableRow({
   user,
-  canManageUsers,
+  canEdit,
+  canToggleActive,
   onEdit,
   onToggleActive,
 }: UsersTableRowProps) {
+  const showActions = canEdit || canToggleActive;
+
   return (
     <li
       className={cn(
         'group px-4 py-4 transition-colors duration-200 hover:bg-slate-50/80 lg:grid lg:items-center lg:gap-4 lg:px-6 lg:py-3.5',
-        canManageUsers
-          ? 'lg:grid-cols-[minmax(200px,2fr)_minmax(100px,1fr)_minmax(100px,1fr)_minmax(100px,1fr)_100px_88px]'
+        showActions
+          ? 'lg:grid-cols-[minmax(200px,2fr)_minmax(100px,1fr)_minmax(100px,1fr)_minmax(100px,1fr)_100px_120px]'
           : 'lg:grid-cols-[minmax(200px,2fr)_minmax(100px,1fr)_minmax(100px,1fr)_minmax(100px,1fr)_100px]',
       )}
     >
@@ -34,26 +37,15 @@ export function UsersTableRow({
           </div>
         </div>
 
-        {canManageUsers && (
-          <div className="flex shrink-0 items-center gap-0.5 lg:hidden">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-sm"
-              onClick={() => onEdit(user)}
-              aria-label="Editar usuario"
-            >
-              <Pencil className="size-4" />
-            </Button>
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon-sm"
-              onClick={() => onToggleActive(user)}
-              aria-label={user.isActive ? 'Desactivar usuario' : 'Activar usuario'}
-            >
-              {user.isActive ? <PowerOff className="size-4" /> : <Power className="size-4" />}
-            </Button>
+        {showActions && (
+          <div className="flex shrink-0 items-center lg:hidden">
+            <UsersRowActionsMenu
+              user={user}
+              canEdit={canEdit}
+              canToggleActive={canToggleActive}
+              onEdit={onEdit}
+              onToggleActive={onToggleActive}
+            />
           </div>
         )}
       </div>
@@ -85,26 +77,15 @@ export function UsersTableRow({
         <StatusBadge isActive={user.isActive} />
       </div>
 
-      {canManageUsers && (
-        <div className="mt-3 hidden items-center justify-center gap-0.5 lg:mt-0 lg:flex lg:opacity-0 lg:transition-opacity lg:group-hover:opacity-100">
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-sm"
-            onClick={() => onEdit(user)}
-            aria-label="Editar usuario"
-          >
-            <Pencil className="size-4" />
-          </Button>
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon-sm"
-            onClick={() => onToggleActive(user)}
-            aria-label={user.isActive ? 'Desactivar usuario' : 'Activar usuario'}
-          >
-            {user.isActive ? <PowerOff className="size-4" /> : <Power className="size-4" />}
-          </Button>
+      {showActions && (
+        <div className="mt-3 hidden justify-end lg:mt-0 lg:flex">
+          <UsersRowActionsMenu
+            user={user}
+            canEdit={canEdit}
+            canToggleActive={canToggleActive}
+            onEdit={onEdit}
+            onToggleActive={onToggleActive}
+          />
         </div>
       )}
 

@@ -14,6 +14,9 @@ import type {
   ReviewCorrectiveClosureResult,
   SubmitResolutionPhotoPayload,
   SubmitResolutionPhotoResult,
+  NotifyCorrectiveActionResult,
+  NotifyCorrectiveActionsBulkResult,
+  DirectCloseCorrectiveActionResult,
 } from '../interfaces';
 
 function getActionsErrorMessage(error: unknown, fallback: string): string {
@@ -221,6 +224,66 @@ export async function reviewCorrectiveClosure(
       getActionsErrorMessage(
         error,
         'No se pudo completar la revisión de cierre. Intenta de nuevo.',
+      ),
+      { cause: error },
+    );
+  }
+}
+
+export async function notifyCorrectiveActionResponsible(
+  actionId: string,
+): Promise<NotifyCorrectiveActionResult> {
+  try {
+    const { data } = await siraApi.post<ApiResponse<NotifyCorrectiveActionResult>>(
+      `/corrective-actions/${actionId}/notify-responsible`,
+    );
+    return data.data;
+  } catch (error) {
+    throw new Error(
+      getActionsErrorMessage(
+        error,
+        'No se pudo notificar al responsable. Intenta de nuevo.',
+      ),
+      { cause: error },
+    );
+  }
+}
+
+export async function notifyCorrectiveActionsResponsibleBulk(
+  actionIds: readonly string[],
+): Promise<NotifyCorrectiveActionsBulkResult> {
+  try {
+    const { data } = await siraApi.post<ApiResponse<NotifyCorrectiveActionsBulkResult>>(
+      '/corrective-actions/notify-responsible-bulk',
+      { actionIds },
+    );
+    return data.data;
+  } catch (error) {
+    throw new Error(
+      getActionsErrorMessage(
+        error,
+        'No se pudo notificar a los responsables. Intenta de nuevo.',
+      ),
+      { cause: error },
+    );
+  }
+}
+
+export async function directCloseCorrectiveAction(
+  actionId: string,
+  reason: string,
+): Promise<DirectCloseCorrectiveActionResult> {
+  try {
+    const { data } = await siraApi.post<ApiResponse<DirectCloseCorrectiveActionResult>>(
+      `/corrective-actions/${actionId}/direct-close`,
+      { reason },
+    );
+    return data.data;
+  } catch (error) {
+    throw new Error(
+      getActionsErrorMessage(
+        error,
+        'No se pudo cerrar la acción directamente. Intenta de nuevo.',
       ),
       { cause: error },
     );

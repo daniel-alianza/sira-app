@@ -1,7 +1,12 @@
 import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/features/auth/store/auth.store';
-import { canManageUsers } from '@/features/auth/utils/role-permissions';
+import {
+  canEditInspectorUsers,
+  canEditUser,
+  canManageUsers,
+  canToggleUserActive,
+} from '@/features/auth/utils/role-permissions';
 import { dashboardCard } from '@/features/dashboard/components/dashboard-ui.classes';
 import {
   UserConfirmDialog,
@@ -11,11 +16,22 @@ import {
   UsersStatsSection,
   UsersTable,
 } from '../components';
+import type { UserEditScope } from '../interfaces';
 import { useUsersPage } from '../hooks';
 
 export function UsersPage() {
   const roleName = useAuthStore((state) => state.user?.role?.name);
   const canManage = canManageUsers(roleName);
+  const canEditInspectors = canEditInspectorUsers(roleName);
+  const canToggleActive = canToggleUserActive(roleName);
+
+  function resolveCanEditUser(user: { role?: { name?: string } }): boolean {
+    return canEditUser(roleName, user.role?.name);
+  }
+
+  function resolveEditScope(): UserEditScope {
+    return canManage ? 'full' : 'inspector';
+  }
   const {
     users,
     catalog,
@@ -57,6 +73,7 @@ export function UsersPage() {
     <div className="w-full space-y-5 md:space-y-6">
       <UsersPageHeader
         canManageUsers={canManage}
+        canEditInspectorUsers={canEditInspectors}
         onCreateClick={canManage ? openCreateModal : undefined}
       />
 
@@ -102,6 +119,8 @@ export function UsersPage() {
           totalCount={users.length}
           hasActiveFilters={hasActiveFilters}
           canManageUsers={canManage}
+          canEditUser={resolveCanEditUser}
+          canToggleUserActive={canToggleActive}
           onEdit={openEditModal}
           onToggleActive={openConfirm}
         />
@@ -117,6 +136,7 @@ export function UsersPage() {
         catalog={catalog}
         roles={roles}
         onSubmit={handleSubmit}
+        editScope={modalMode === 'edit' ? resolveEditScope() : 'full'}
       />
 
       <UserConfirmDialog

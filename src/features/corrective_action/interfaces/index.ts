@@ -10,6 +10,7 @@ export type {
   ActionsTableProps,
   ActionStatusFilter,
   ActionsListStatusGroup,
+  ActionsListQueue,
   ApiResponse,
   CorrectiveActionDetail,
   CorrectiveActionItem,
@@ -21,5 +22,8 @@ export type {
   ReviewCorrectiveClosureResult,
   SubmitResolutionPhotoPayload,
   SubmitResolutionPhotoResult,
+  NotifyCorrectiveActionResult,
+  NotifyCorrectiveActionsBulkResult,
+  DirectCloseCorrectiveActionResult,
   TourDetectionType,
 } from './corrective-action.interfaces';

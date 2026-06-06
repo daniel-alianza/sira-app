@@ -1,4 +1,4 @@
-import { Eye, ImageOff } from 'lucide-react';
+import { Bell, Eye, ImageOff, Loader2, ShieldCheck } from 'lucide-react';
 import { MediaImage } from '@/components/MediaImage';
 import { cn } from '@/lib/utils';
 import {
@@ -21,6 +21,9 @@ export interface DetectionListRowProps {
   readonly metaLine?: string;
   readonly footerLine?: string;
   readonly onViewDetail?: () => void;
+  readonly onNotifyUser?: () => void;
+  readonly isNotifying?: boolean;
+  readonly onDirectClose?: () => void;
 }
 
 interface ListPhotoThumbProps {
@@ -70,6 +73,9 @@ export function DetectionListRow({
   metaLine,
   footerLine,
   onViewDetail,
+  onNotifyUser,
+  isNotifying = false,
+  onDirectClose,
 }: DetectionListRowProps) {
   return (
     <div className="flex flex-col gap-4 px-4 py-4 md:flex-row md:items-start md:px-6">
@@ -127,15 +133,44 @@ export function DetectionListRow({
         )}
       </div>
 
-      {onViewDetail && (
-        <button
-          type="button"
-          onClick={onViewDetail}
-          className="inline-flex shrink-0 items-center gap-1.5 self-start rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-[#0A2240] shadow-sm transition-colors hover:bg-slate-50"
-        >
-          <Eye className="size-3.5" />
-          Ver detalle
-        </button>
+      {(onViewDetail || onNotifyUser || onDirectClose) && (
+        <div className="inline-flex shrink-0 flex-col gap-2 self-start sm:flex-row sm:flex-wrap">
+          {onDirectClose && (
+            <button
+              type="button"
+              onClick={onDirectClose}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-[#0A2240]/20 bg-[#0A2240]/5 px-3 py-1.5 text-xs font-medium text-[#0A2240] shadow-sm transition-colors hover:bg-[#0A2240]/10"
+            >
+              <ShieldCheck className="size-3.5" />
+              Cierre directo SHE
+            </button>
+          )}
+          {onNotifyUser && (
+            <button
+              type="button"
+              onClick={onNotifyUser}
+              disabled={isNotifying}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-amber-200 bg-amber-50 px-3 py-1.5 text-xs font-medium text-amber-900 shadow-sm transition-colors hover:bg-amber-100 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isNotifying ? (
+                <Loader2 className="size-3.5 animate-spin" />
+              ) : (
+                <Bell className="size-3.5" />
+              )}
+              Notificar al usuario
+            </button>
+          )}
+          {onViewDetail && (
+            <button
+              type="button"
+              onClick={onViewDetail}
+              className="inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-[#0A2240] shadow-sm transition-colors hover:bg-slate-50"
+            >
+              <Eye className="size-3.5" />
+              Ver detalle
+            </button>
+          )}
+        </div>
       )}
     </div>
   );

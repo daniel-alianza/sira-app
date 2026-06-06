@@ -73,6 +73,7 @@ export function DashboardPage() {
       <section className='flex w-full flex-col gap-3 md:gap-4'>
         <DashboardAiSummary
           summary={dashboard.aiSummary}
+          kpis={dashboard.overview?.kpis}
           isLoading={dashboard.isAiSummaryLoading}
           isError={dashboard.isAiSummaryError}
           onRetry={() => {

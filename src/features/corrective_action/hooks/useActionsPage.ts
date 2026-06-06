@@ -5,6 +5,7 @@ import { CORRECTIVE_ACTIONS_QUERY_KEY } from '../interfaces';
 import type {
   ActionStatusFilter,
   ActionsListStatusGroup,
+  ActionsListQueue,
   CorrectiveActionItem,
 } from '../interfaces';
 import type { TourDetectionType } from '@/features/tours/interfaces';
@@ -64,6 +65,7 @@ export function useActionsPage() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [statusFilter, setStatusFilter] = useState<ActionStatusFilter>('all');
   const [statusGroup, setStatusGroup] = useState<ActionsListStatusGroup | null>(null);
+  const [listQueue, setListQueue] = useState<ActionsListQueue | null>(null);
   const [detectionTypeFilter, setDetectionTypeFilter] = useState<TourDetectionType | null>(
     null,
   );
@@ -74,6 +76,7 @@ export function useActionsPage() {
     setStatusFilter(parsed.statusFilter);
     setStatusGroup(parsed.statusGroup);
     setDetectionTypeFilter(parsed.detectionType);
+    setListQueue(parsed.listQueue);
     setFilters({
       ...FILTER_INITIAL,
       ...parsed.filters,
@@ -140,12 +143,14 @@ export function useActionsPage() {
     setStatusGroup(null);
     setStatusFilter('all');
     setDetectionTypeFilter(null);
+    setListQueue(null);
   }
 
   return {
     statusFilter,
     setStatusFilter: updateStatusFilter,
     statusGroup,
+    listQueue,
     statusCounts,
     filteredActions,
     pendingCount,

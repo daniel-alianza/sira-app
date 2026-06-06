@@ -1,3 +1,4 @@
+export { ActionDirectCloseModal } from './ActionDirectCloseModal';
 export { ActionDetailEvidenceGallery } from './ActionDetailEvidenceGallery';
 export { ActionDetailProgressTimeline } from './ActionDetailProgressTimeline';
 export { ActionDetailHeader } from './ActionDetailHeader';

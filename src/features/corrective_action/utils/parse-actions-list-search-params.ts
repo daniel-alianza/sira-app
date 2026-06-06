@@ -1,6 +1,6 @@
 import type { CorrectiveActionStatus, TourDetectionType } from '@/features/tours/interfaces';
 import type { ActionsQueryParams } from '../service/action.service';
-import type { ActionStatusFilter, ActionsListStatusGroup } from '../interfaces';
+import type { ActionStatusFilter, ActionsListStatusGroup, ActionsListQueue } from '../interfaces';
 import {
   isActionsListIsoDate,
   isActionsListUuid,
@@ -31,11 +31,16 @@ function isActionsListStatusGroup(value: string): value is ActionsListStatusGrou
   return value === 'all' || value === 'active';
 }
 
+function isActionsListQueue(value: string): value is ActionsListQueue {
+  return value === 'not-signed';
+}
+
 export interface ParsedActionsListSearchParams {
   readonly statusFilter: ActionStatusFilter;
   readonly statusGroup: ActionsListStatusGroup | null;
   readonly filters: ActionsQueryParams;
   readonly detectionType: TourDetectionType | null;
+  readonly listQueue: ActionsListQueue | null;
 }
 
 function readOptionalParam(
@@ -63,6 +68,7 @@ export function parseActionsListSearchParams(
   const statusParam = readOptionalParam(searchParams, 'status');
   const statusGroupParam = readOptionalParam(searchParams, 'statusGroup');
   const detectionTypeParam = readOptionalParam(searchParams, 'detectionType');
+  const queueParam = readOptionalParam(searchParams, 'queue');
 
   if (companyId && isActionsListUuid(companyId)) {
     filters.companyId = companyId;
@@ -101,11 +107,15 @@ export function parseActionsListSearchParams(
       ? detectionTypeParam
       : null;
 
+  const listQueue =
+    queueParam && isActionsListQueue(queueParam) ? queueParam : null;
+
   return {
     statusFilter,
     statusGroup,
     filters: filters as ActionsQueryParams,
     detectionType,
+    listQueue,
   };
 }
 

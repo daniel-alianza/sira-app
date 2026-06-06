@@ -8,6 +8,7 @@ import {
   ROLE_INSPECTOR,
   canRespondToActions,
   canReviewActionClosure,
+  canDirectCloseSheActions,
 } from '@/features/auth/utils/role-permissions';
 import { getUsers } from '@/features/users/services/users.service';
 import {
@@ -22,6 +23,7 @@ import {
   ActionDetailRespondForm,
   ActionDetailStatusPanel,
   ReassignResponsibleModal,
+  ActionDirectCloseModal,
 } from '../components';
 import { useActionDetail } from '../hooks/useActionDetail';
 
@@ -29,10 +31,13 @@ export function ActionDetailPage() {
   const navigate = useNavigate();
   const { actionId } = useParams<{ actionId: string }>();
   const roleName = useAuthStore((state) => state.user?.role?.name);
+  const areaName = useAuthStore((state) => state.user?.area?.name);
   const canRespond = canRespondToActions(roleName);
   const canReviewClosure = canReviewActionClosure(roleName);
+  const canDirectClose = canDirectCloseSheActions(areaName);
   const detailQuery = useActionDetail(actionId);
   const [reassignModalOpen, setReassignModalOpen] = useState(false);
+  const [directCloseModalOpen, setDirectCloseModalOpen] = useState(false);
 
   const usersQuery = useQuery({
     queryKey: ['users', 'active'],
@@ -90,16 +95,27 @@ export function ActionDetailPage() {
           onBack={handleBack}
           backLabel={backLabel}
         />
-        {canReviewClosure && (
-          <button
-            type="button"
-            onClick={() => setReassignModalOpen(true)}
-            className="mt-2 inline-flex shrink-0 cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-[#0A2240] shadow-sm transition-colors hover:bg-slate-50"
-          >
-            <UserRound className="size-3.5" />
-            Reasignar responsable
-          </button>
-        )}
+        <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
+          {canReviewClosure && (
+            <button
+              type="button"
+              onClick={() => setReassignModalOpen(true)}
+              className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-medium text-[#0A2240] shadow-sm transition-colors hover:bg-slate-50"
+            >
+              <UserRound className="size-3.5" />
+              Reasignar responsable
+            </button>
+          )}
+          {canDirectClose && detail.status !== 'closed' && (
+            <button
+              type="button"
+              onClick={() => setDirectCloseModalOpen(true)}
+              className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-[#0A2240]/20 bg-[#0A2240]/5 px-3 py-2 text-xs font-medium text-[#0A2240] shadow-sm transition-colors hover:bg-[#0A2240]/10"
+            >
+              Cierre directo SHE
+            </button>
+          )}
+        </div>
       </div>
 
       {actionId && (
@@ -161,6 +177,15 @@ export function ActionDetailPage() {
           status={detail.status}
           resolutionDurationMinutes={detail.resolutionDurationMinutes}
           hasResolutionPhoto={Boolean(detail.resolutionPhotoUrl)}
+        />
+      )}
+
+      {actionId && canDirectClose && (
+        <ActionDirectCloseModal
+          actionId={actionId}
+          detectionFolio={detail.detectionFolio}
+          open={directCloseModalOpen}
+          onClose={() => setDirectCloseModalOpen(false)}
         />
       )}
 

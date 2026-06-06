@@ -34,6 +34,7 @@ export function UserModal({
   catalog,
   roles,
   onSubmit,
+  editScope = 'full',
 }: UserModalProps) {
   const overlayRef = useRef<HTMLDivElement>(null);
   const [apiError, setApiError] = useState<string | null>(null);
@@ -139,6 +140,8 @@ export function UserModal({
 
   if (!open) return null;
 
+  const isInspectorEditScope = editScope === 'inspector';
+
   return (
     <div
       ref={overlayRef}
@@ -156,12 +159,18 @@ export function UserModal({
         <div className="flex items-center justify-between border-b border-slate-200/90 bg-slate-50/80 px-6 py-4">
           <div>
             <h2 className={cn(dashboardHeadingClass, 'text-lg')}>
-              {mode === 'create' ? 'Nuevo usuario' : 'Editar usuario'}
+              {mode === 'create'
+                ? 'Nuevo usuario'
+                : isInspectorEditScope
+                  ? 'Editar inspector'
+                  : 'Editar usuario'}
             </h2>
             <p className={cn(dashboardSubtextClass, 'mt-0.5 text-xs')}>
               {mode === 'create'
                 ? 'Completa los datos para registrar un usuario'
-                : 'Actualiza la información del usuario'}
+                : isInspectorEditScope
+                  ? 'Actualiza la información del inspector'
+                  : 'Actualiza la información del usuario'}
             </p>
           </div>
           <Button variant="ghost" size="icon-sm" onClick={onClose} aria-label="Cerrar">
@@ -330,7 +339,7 @@ export function UserModal({
                         value={field.value}
                         items={roleItems}
                         onValueChange={field.onChange}
-                        disabled={roleItems.length === 0}
+                        disabled={roleItems.length === 0 || isInspectorEditScope}
                       >
                         <SelectTrigger className="w-full">
                           <SelectValue
@@ -358,6 +367,7 @@ export function UserModal({
               </div>
             </div>
 
+            {!isInspectorEditScope && (
             <div className="flex items-center gap-3 rounded-xl border border-slate-200/90 px-4 py-3">
               <Controller
                 name="isActive"
@@ -391,6 +401,7 @@ export function UserModal({
                 )}
               />
             </div>
+            )}
           </div>
 
           <div className="flex items-center justify-end gap-2 border-t border-slate-200/90 bg-slate-50/50 px-6 py-4">

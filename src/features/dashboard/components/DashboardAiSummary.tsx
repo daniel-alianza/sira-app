@@ -1,7 +1,11 @@
 import { Sparkles, TrendingDown, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import type { DashboardAiSummary } from '../interfaces';
+import type { DashboardAiSummary, DashboardKpis } from '../interfaces';
+import {
+  buildDashboardAiHighlightsFromKpis,
+  stripFormalGreeting,
+} from '../utils/dashboard-ai-summary.utils';
 import { dashboardCard, dashboardHeadingClass, dashboardSubtextClass } from './dashboard-ui.classes';
 
 const toneClasses = {
@@ -12,6 +16,7 @@ const toneClasses = {
 
 export interface DashboardAiSummaryProps {
   readonly summary: DashboardAiSummary | undefined;
+  readonly kpis: DashboardKpis | undefined;
   readonly isLoading: boolean;
   readonly isError: boolean;
   readonly onRetry: () => void;
@@ -19,10 +24,16 @@ export interface DashboardAiSummaryProps {
 
 export function DashboardAiSummary({
   summary,
+  kpis,
   isLoading,
   isError,
   onRetry,
 }: DashboardAiSummaryProps) {
+  const highlights = kpis ? buildDashboardAiHighlightsFromKpis(kpis) : summary?.highlights ?? [];
+  const headline = summary ? stripFormalGreeting(summary.headline) : '';
+  const paragraphs = summary?.paragraphs.map(stripFormalGreeting) ?? [];
+  const trendNote = summary ? stripFormalGreeting(summary.trendNote) : '';
+  const riskNote = summary ? stripFormalGreeting(summary.riskNote) : '';
   return (
     <div
       className={cn(
@@ -71,17 +82,17 @@ export function DashboardAiSummary({
         {!isLoading && !isError && summary ? (
           <>
             <p className="text-sm font-medium leading-snug text-[#0A2240] md:text-lg">
-              {summary.headline}
+              {headline}
             </p>
             <div className="space-y-2">
-              {summary.paragraphs.map((paragraph) => (
+              {paragraphs.map((paragraph) => (
                 <p key={paragraph} className={cn(dashboardSubtextClass, 'leading-relaxed')}>
                   {paragraph}
                 </p>
               ))}
             </div>
             <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:gap-3">
-              {summary.highlights.map((item) => (
+              {highlights.map((item) => (
                 <div
                   key={item.label}
                   className={cn('rounded-xl border px-3 py-2 md:px-4 md:py-2.5', toneClasses[item.tone])}
@@ -93,9 +104,9 @@ export function DashboardAiSummary({
             </div>
             <p className={cn(dashboardSubtextClass, 'flex flex-wrap items-center gap-2')}>
               <TrendingUp className="size-3.5 shrink-0 text-emerald-600" />
-              <span>{summary.trendNote}</span>
+              <span>{trendNote}</span>
               <TrendingDown className="size-3.5 shrink-0 text-orange-600" />
-              <span>{summary.riskNote}</span>
+              <span>{riskNote}</span>
             </p>
           </>
         ) : null}

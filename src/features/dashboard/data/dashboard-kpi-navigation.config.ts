@@ -82,6 +82,10 @@ export function buildDashboardKpiSearchParams(
     params.detectionType = filters.activity;
   }
 
+  if (kpiId === 'not-signed') {
+    params.queue = 'not-signed';
+  }
+
   const query = createSearchParams(params).toString();
   return query.length > 0 ? `?${query}` : '';
 }

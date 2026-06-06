@@ -52,6 +52,7 @@ export interface UserCatalog {
 }
 
 export type ModalMode = 'create' | 'edit';
+export type UserEditScope = 'full' | 'inspector';
 export type StatusFilter = 'all' | 'active' | 'inactive';
 export type StatCardTone = 'default' | 'success' | 'muted';
 
@@ -68,6 +69,7 @@ export interface UserModalProps {
   catalog: UserCatalog;
   roles: CatalogItem[];
   onSubmit: (values: UserFormValues) => Promise<void>;
+  editScope?: UserEditScope;
 }
 
 export interface UserConfirmDialogProps {
@@ -114,6 +116,7 @@ export interface CatalogFilterSelectProps {
 
 export interface UsersPageHeaderProps {
   readonly canManageUsers: boolean;
+  readonly canEditInspectorUsers: boolean;
   readonly onCreateClick?: () => void;
 }
 
@@ -143,13 +146,16 @@ export interface UsersTableProps {
   totalCount: number;
   hasActiveFilters: boolean;
   canManageUsers: boolean;
+  canEditUser: (user: User) => boolean;
+  canToggleUserActive: boolean;
   onEdit: (user: User) => void;
   onToggleActive: (user: User) => void;
 }
 
 export interface UsersTableRowProps {
   user: User;
-  canManageUsers: boolean;
+  canEdit: boolean;
+  canToggleActive: boolean;
   onEdit: (user: User) => void;
   onToggleActive: (user: User) => void;
 }

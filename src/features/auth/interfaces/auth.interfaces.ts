@@ -8,11 +8,17 @@ export interface SessionUserRole {
   name: string;
 }
 
+export interface SessionUserArea {
+  id: string;
+  name: string;
+}
+
 export interface SessionUser {
   id: string;
   name: string;
   email: string;
   role: SessionUserRole;
+  area?: SessionUserArea;
 }
 
 export interface ApiResponse<T> {
