@@ -12,6 +12,7 @@ import type { TourDetectionType } from '@/features/tours/interfaces';
 import type { ActionsQueryParams } from '../service/action.service';
 import { fetchMyCorrectiveActions } from '../service/action.service';
 import {
+  filterActionsByListQueue,
   filterActionsByStatusGroup,
   parseActionsListSearchParams,
 } from '../utils/parse-actions-list-search-params';
@@ -104,8 +105,10 @@ export function useActionsPage() {
       result = result.filter((action) => action.detectionType === detectionTypeFilter);
     }
 
-    return filterActionsByStatusGroup(result, statusGroup);
-  }, [allActions, statusFilter, statusGroup, detectionTypeFilter]);
+    result = filterActionsByStatusGroup(result, statusGroup);
+
+    return filterActionsByListQueue(result, listQueue);
+  }, [allActions, statusFilter, statusGroup, detectionTypeFilter, listQueue]);
 
   const pendingCount = statusCounts.pending_acceptance;
 
@@ -114,6 +117,9 @@ export function useActionsPage() {
       setSearchParams(
         (current) => {
           const nextParams = new URLSearchParams(current);
+
+          nextParams.delete('statusGroup');
+          nextParams.delete('queue');
 
           if (next === 'all') {
             nextParams.delete('status');

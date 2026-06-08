@@ -26,23 +26,19 @@ export function canEditInspectorUsers(roleName?: string): boolean {
   return roleName === ROLE_ADMINISTRATOR || roleName === ROLE_INSPECTOR;
 }
 
+export function canFullyEditUsers(roleName?: string): boolean {
+  return roleName === ROLE_ADMINISTRATOR || roleName === ROLE_INSPECTOR;
+}
+
 export function canEditUser(
   sessionRoleName: string | undefined,
-  targetRoleName: string | undefined,
+  _targetRoleName: string | undefined,
 ): boolean {
-  if (sessionRoleName === ROLE_ADMINISTRATOR) {
-    return true;
-  }
-
-  if (sessionRoleName === ROLE_INSPECTOR) {
-    return targetRoleName === ROLE_INSPECTOR;
-  }
-
-  return false;
+  return canFullyEditUsers(sessionRoleName);
 }
 
 export function canToggleUserActive(roleName?: string): boolean {
-  return roleName === ROLE_ADMINISTRATOR;
+  return canFullyEditUsers(roleName);
 }
 
 import { SHE_AREA_NAME } from '@/features/corrective_action/interfaces/she-area.constants';

@@ -30,8 +30,8 @@ const KPI_NAVIGATION_TARGETS: Record<DashboardKpiNavigationId, DashboardKpiNavig
   'closure-review': { pathname: '/actions', status: 'closure_review' },
   rejected: { pathname: '/actions', status: 'rejected' },
   walkthroughs: { pathname: '/tours' },
-  'not-responded': { pathname: '/actions', status: 'pending_acceptance' },
-  'not-signed': { pathname: '/actions', status: 'open' },
+  'not-responded': { pathname: '/actions', status: 'open' },
+  'not-signed': { pathname: '/actions', status: 'pending_acceptance' },
 };
 
 export function buildDashboardKpiSearchParams(

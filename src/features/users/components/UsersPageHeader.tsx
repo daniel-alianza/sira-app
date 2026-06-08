@@ -20,7 +20,7 @@ export function UsersPageHeader({
           {canManageUsers
             ? 'Gestiona cuentas, roles y acceso al sistema'
             : canEditInspectorUsers
-              ? 'Consulta usuarios y edita la información de inspectores'
+              ? 'Consulta usuarios y administra cuentas, roles y acceso al sistema'
               : 'Consulta cuentas, roles y ubicación de los responsables'}
         </p>
       </div>

@@ -129,3 +129,14 @@ export function filterActionsByStatusGroup<T extends { readonly status: Correcti
 
   return actions.filter((action) => ACTIVE_STATUSES.includes(action.status));
 }
+
+export function filterActionsByListQueue<T extends { readonly status: CorrectiveActionStatus }>(
+  actions: readonly T[],
+  listQueue: ActionsListQueue | null,
+): T[] {
+  if (listQueue !== 'not-signed') {
+    return [...actions];
+  }
+
+  return actions.filter((action) => action.status === 'pending_acceptance');
+}

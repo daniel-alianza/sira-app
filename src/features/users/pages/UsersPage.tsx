@@ -4,6 +4,7 @@ import { useAuthStore } from '@/features/auth/store/auth.store';
 import {
   canEditInspectorUsers,
   canEditUser,
+  canFullyEditUsers,
   canManageUsers,
   canToggleUserActive,
 } from '@/features/auth/utils/role-permissions';
@@ -30,7 +31,7 @@ export function UsersPage() {
   }
 
   function resolveEditScope(): UserEditScope {
-    return canManage ? 'full' : 'inspector';
+    return canFullyEditUsers(roleName) ? 'full' : 'inspector';
   }
   const {
     users,

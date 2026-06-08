@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useMemo, useState } from 'react';
 import { useAuthStore } from '@/features/auth/store/auth.store';
-import { canManageUsers } from '@/features/auth/utils/role-permissions';
+import { canFullyEditUsers } from '@/features/auth/utils/role-permissions';
 import { useCatalogSelectors } from '@/features/catalog/hooks/useCatalogSelectors';
 import {
   EMPTY_CATALOG,
@@ -29,7 +29,7 @@ const USERS_QUERY_KEY = ['users'] as const;
 export function useUsersPage() {
   const queryClient = useQueryClient();
   const roleName = useAuthStore((state) => state.user?.role?.name);
-  const canManage = canManageUsers(roleName);
+  const canFullEdit = canFullyEditUsers(roleName);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<ModalMode>('create');
   const [editingUser, setEditingUser] = useState<User | null>(null);
@@ -79,7 +79,7 @@ export function useUsersPage() {
     mutationFn: ({ id, values }: { id: string; values: UserFormValues }) =>
       updateUser(
         id,
-        buildUpdateUserPayload(values, canManage ? 'full' : 'inspector'),
+        buildUpdateUserPayload(values, canFullEdit ? 'full' : 'inspector'),
       ),
     onSuccess: invalidateUsers,
   });
