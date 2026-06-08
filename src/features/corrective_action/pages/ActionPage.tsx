@@ -46,7 +46,9 @@ export function ActionPage() {
     clearFilters,
     listQueue,
   } = useActionsPage();
-  const showNotifyActions = canNotifyUsers && listQueue === 'not-signed';
+  const showNotifyActions =
+    canNotifyUsers &&
+    (listQueue === 'not-signed' || statusFilter === 'pending_acceptance');
   const {
     notifyAction,
     notifyAllActions,
