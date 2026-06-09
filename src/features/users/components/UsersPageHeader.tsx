@@ -9,6 +9,7 @@ import type { UsersPageHeaderProps } from '../interfaces';
 
 export function UsersPageHeader({
   canManageUsers,
+  canCreateUsers,
   canEditInspectorUsers,
   onCreateClick,
 }: UsersPageHeaderProps) {
@@ -19,12 +20,14 @@ export function UsersPageHeader({
         <p className={cn(dashboardSubtextClass, 'mt-1')}>
           {canManageUsers
             ? 'Gestiona cuentas, roles y acceso al sistema'
-            : canEditInspectorUsers
-              ? 'Consulta usuarios y administra cuentas, roles y acceso al sistema'
-              : 'Consulta cuentas, roles y ubicación de los responsables'}
+            : canCreateUsers
+              ? 'Consulta usuarios y registra nuevas cuentas en el sistema'
+              : canEditInspectorUsers
+                ? 'Consulta usuarios y administra cuentas, roles y acceso al sistema'
+                : 'Consulta cuentas, roles y ubicación de los responsables'}
         </p>
       </div>
-      {canManageUsers && onCreateClick && (
+      {canCreateUsers && onCreateClick && (
         <button type="button" onClick={onCreateClick} className={dashboardButtonPrimary()}>
           <Plus className="size-4" />
           Nuevo usuario

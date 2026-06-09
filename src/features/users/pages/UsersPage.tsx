@@ -2,6 +2,7 @@ import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuthStore } from '@/features/auth/store/auth.store';
 import {
+  canCreateUsers,
   canEditInspectorUsers,
   canEditUser,
   canFullyEditUsers,
@@ -23,6 +24,7 @@ import { useUsersPage } from '../hooks';
 export function UsersPage() {
   const roleName = useAuthStore((state) => state.user?.role?.name);
   const canManage = canManageUsers(roleName);
+  const canCreate = canCreateUsers(roleName);
   const canEditInspectors = canEditInspectorUsers(roleName);
   const canToggleActive = canToggleUserActive(roleName);
 
@@ -74,8 +76,9 @@ export function UsersPage() {
     <div className="w-full space-y-5 md:space-y-6">
       <UsersPageHeader
         canManageUsers={canManage}
+        canCreateUsers={canCreate}
         canEditInspectorUsers={canEditInspectors}
-        onCreateClick={canManage ? openCreateModal : undefined}
+        onCreateClick={canCreate ? openCreateModal : undefined}
       />
 
       <UsersStatsSection

@@ -22,6 +22,10 @@ export function canManageUsers(roleName?: string): boolean {
   return roleName === ROLE_ADMINISTRATOR;
 }
 
+export function canCreateUsers(roleName?: string): boolean {
+  return roleName === ROLE_ADMINISTRATOR || roleName === ROLE_INSPECTOR;
+}
+
 export function canEditInspectorUsers(roleName?: string): boolean {
   return roleName === ROLE_ADMINISTRATOR || roleName === ROLE_INSPECTOR;
 }

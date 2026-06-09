@@ -116,6 +116,7 @@ export interface CatalogFilterSelectProps {
 
 export interface UsersPageHeaderProps {
   readonly canManageUsers: boolean;
+  readonly canCreateUsers: boolean;
   readonly canEditInspectorUsers: boolean;
   readonly onCreateClick?: () => void;
 }

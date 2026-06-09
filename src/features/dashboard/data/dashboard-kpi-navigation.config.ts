@@ -34,6 +34,11 @@ const KPI_NAVIGATION_TARGETS: Record<DashboardKpiNavigationId, DashboardKpiNavig
   'not-signed': { pathname: '/actions', status: 'pending_acceptance' },
 };
 
+const PERIOD_SCOPED_KPIS: readonly DashboardKpiNavigationId[] = [
+  'total',
+  'walkthroughs',
+];
+
 export function buildDashboardKpiSearchParams(
   kpiId: DashboardKpiNavigationId,
   filters: DashboardFiltersState,
@@ -67,12 +72,14 @@ export function buildDashboardKpiSearchParams(
     params.responsibleId = filters.responsibleId;
   }
 
-  if (isActionsListIsoDate(filters.dateFrom)) {
-    params.dateFrom = filters.dateFrom;
-  }
+  if (PERIOD_SCOPED_KPIS.includes(kpiId)) {
+    if (isActionsListIsoDate(filters.dateFrom)) {
+      params.dateFrom = filters.dateFrom;
+    }
 
-  if (isActionsListIsoDate(filters.dateTo)) {
-    params.dateTo = filters.dateTo;
+    if (isActionsListIsoDate(filters.dateTo)) {
+      params.dateTo = filters.dateTo;
+    }
   }
 
   if (
