@@ -5,6 +5,7 @@ export type {
   DashboardAiHighlightTone,
   DashboardAiSummary,
   DashboardAreaComplianceItem,
+  DashboardAreaUserStats,
   DashboardCharts,
   DashboardComplianceByAreaChartItem,
   DashboardCommitmentDateRequestItem,

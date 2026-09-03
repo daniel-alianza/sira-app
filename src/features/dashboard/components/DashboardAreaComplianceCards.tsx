@@ -1,6 +1,6 @@
-import { AlertTriangle, CheckCircle2, XCircle } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, XCircle, User } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import type { DashboardAreaComplianceItem } from '../interfaces';
+import type { DashboardAreaComplianceItem, DashboardAreaUserStats } from '../interfaces';
 import {
   dashboardCardInteractive,
   dashboardHeadingClass,
@@ -19,6 +19,66 @@ export interface DashboardAreaComplianceCardsProps {
   readonly isLoading: boolean;
 }
 
+function UserStatsRow({ user }: { readonly user: DashboardAreaUserStats }) {
+  const totalOpen = user.open + user.pending + user.pendingAcceptance + user.inReview + user.expired + user.reopened;
+  
+  return (
+    <div className="rounded-md border border-slate-200 bg-slate-50/50 p-3 text-xs">
+      <div className="mb-2 flex items-center gap-2">
+        <User className="size-3.5 text-slate-600" />
+        <span className="font-medium text-slate-900">
+          {user.userName}
+          {totalOpen > 0 && (
+            <span className="ml-1.5 text-orange-600">
+              ({totalOpen} pendiente{totalOpen !== 1 ? 's' : ''})
+            </span>
+          )}
+        </span>
+      </div>
+      <div className="grid grid-cols-2 gap-x-3 gap-y-1 text-slate-600">
+        <div className="flex justify-between">
+          <span>Abiertas:</span>
+          <span className="font-medium text-slate-900">{user.open}</span>
+        </div>
+        <div className="flex justify-between">
+          <span>Pendientes:</span>
+          <span className="font-medium text-slate-900">{user.pending}</span>
+        </div>
+        <div className="flex justify-between">
+          <span>Pend. aceptación:</span>
+          <span className="font-medium text-slate-900">{user.pendingAcceptance}</span>
+        </div>
+        <div className="flex justify-between">
+          <span>En revisión:</span>
+          <span className="font-medium text-slate-900">{user.inReview}</span>
+        </div>
+        <div className="flex justify-between">
+          <span>Expiradas:</span>
+          <span className={cn('font-medium', user.expired > 0 ? 'text-orange-600' : 'text-slate-900')}>
+            {user.expired}
+          </span>
+        </div>
+        <div className="flex justify-between">
+          <span>Cerradas:</span>
+          <span className="font-medium text-emerald-600">{user.closed}</span>
+        </div>
+        <div className="flex justify-between">
+          <span>Rechazadas:</span>
+          <span className={cn('font-medium', user.rejected > 0 ? 'text-red-600' : 'text-slate-900')}>
+            {user.rejected}
+          </span>
+        </div>
+        <div className="flex justify-between">
+          <span>Reabiertas:</span>
+          <span className={cn('font-medium', user.reopened > 0 ? 'text-orange-600' : 'text-slate-900')}>
+            {user.reopened}
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function DashboardAreaComplianceCards({
   areas,
   avgClosureDays,
@@ -28,11 +88,11 @@ export function DashboardAreaComplianceCards({
     <section className="space-y-4">
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
-          <h2 className={cn(dashboardHeadingClass, 'text-lg')}>Cumplimiento por área recorrida</h2>
+          <h2 className={cn(dashboardHeadingClass, 'text-lg')}>Avance por área</h2>
           <p className={cn(dashboardSubtextClass, 'mt-1')}>
             {areas.length > 0
-              ? `${areas.length} área${areas.length === 1 ? '' : 's'} con acciones en el periodo`
-              : 'Sin acciones por área en el periodo seleccionado'}
+              ? `${areas.length} área${areas.length === 1 ? '' : 's'} en las que tienes acceso`
+              : 'Sin áreas disponibles en el periodo seleccionado'}
           </p>
         </div>
         <p className={dashboardSubtextClass}>
@@ -44,22 +104,22 @@ export function DashboardAreaComplianceCards({
       </div>
 
       {isLoading ? (
-        <p className={cn(dashboardSubtextClass, 'text-sm')}>Cargando cumplimiento por área...</p>
+        <p className={cn(dashboardSubtextClass, 'text-sm')}>Cargando avance por área...</p>
       ) : areas.length === 0 ? (
         <p className={cn(dashboardSubtextClass, 'text-sm')}>
-          No hay datos de cumplimiento para los filtros actuales.
+          No hay datos de áreas para los filtros actuales.
         </p>
       ) : (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 lg:gap-4">
           {areas.map((area) => {
             const trendPositive = area.trend.startsWith('+');
             const trendNeutral = area.trend === '—';
+            const hasUsers = area.users && area.users.length > 0;
 
             return (
-              <button
+              <div
                 key={area.id}
-                type="button"
-                className={cn(dashboardCardInteractive(), 'w-full text-left')}
+                className={cn(dashboardCardInteractive(), 'w-full')}
               >
                 <div className="space-y-4 p-4">
                   <div className="flex items-start justify-between gap-2">
@@ -114,8 +174,23 @@ export function DashboardAreaComplianceCards({
                       </span>
                     ) : null}
                   </div>
+
+                  {hasUsers && (
+                    <>
+                      <div className="border-t border-slate-200 pt-3">
+                        <p className={cn(dashboardSubtextClass, 'mb-2 text-xs font-medium')}>
+                          Usuarios ({area.users.length})
+                        </p>
+                      </div>
+                      <div className="space-y-2 max-h-[400px] overflow-y-auto">
+                        {area.users.map((user) => (
+                          <UserStatsRow key={user.userId} user={user} />
+                        ))}
+                      </div>
+                    </>
+                  )}
                 </div>
-              </button>
+              </div>
             );
           })}
         </div>

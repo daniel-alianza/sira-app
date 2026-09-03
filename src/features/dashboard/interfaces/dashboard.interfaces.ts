@@ -35,6 +35,19 @@ export interface DashboardKpis {
   readonly notSignedUsers: number;
 }
 
+export interface DashboardAreaUserStats {
+  readonly userId: string;
+  readonly userName: string;
+  readonly open: number;
+  readonly pending: number;
+  readonly pendingAcceptance: number;
+  readonly inReview: number;
+  readonly expired: number;
+  readonly closed: number;
+  readonly rejected: number;
+  readonly reopened: number;
+}
+
 export interface DashboardAreaComplianceItem {
   readonly id: string;
   readonly name: string;
@@ -43,6 +56,7 @@ export interface DashboardAreaComplianceItem {
   readonly actionsTotal: number;
   readonly expired: number;
   readonly trend: string;
+  readonly users?: readonly DashboardAreaUserStats[];
 }
 
 export interface DashboardCommitmentDateRequestItem {
